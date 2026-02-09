@@ -34,7 +34,7 @@ function parseLatLon(input) {
   return null;
 }
 
-// Fetch lat/lon for a city name
+// Fetch lat/lon and full resolved name for a city
 async function geocode(city) {
   const cityParam = encodeURIComponent(city);
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityParam}&count=1`;
@@ -45,7 +45,14 @@ async function geocode(city) {
   if (!data.results || data.results.length === 0) {
     throw new Error(`City not found: ${city}`);
   }
-  return data.results[0];
+  const geo = data.results[0];
+
+  // Build full display name: city, state/province, country
+  let displayName = geo.name;
+  if (geo.admin1) displayName += `, ${geo.admin1}`;
+  if (geo.country) displayName += `, ${geo.country}`;
+
+  return { lat: geo.latitude, lon: geo.longitude, name: displayName, timezone: geo.timezone };
 }
 
 // Fetch weather for lat/lon
@@ -57,16 +64,29 @@ async function getWeather(lat, lon) {
   return data.current_weather;
 }
 
+// Fetch current time for a location using timezone
+function getLocalTime(timezone) {
+  try {
+    const now = new Date();
+    return now.toLocaleTimeString("en-US", { timeZone: timezone, hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "N/A";
+  }
+}
+
 // Render one card
-function renderCard(name, weather) {
+function renderCard(location, weather) {
   const temp = useFahrenheit
     ? `${toF(weather.temperature).toFixed(1)} °F`
     : `${weather.temperature} °C`;
 
+  const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
+
   const card = document.createElement("div");
   card.className = "card";
   card.innerHTML = `
-    <h2>${name}</h2>
+    <h2>${location.name}</h2>
+    <p>Local Time: ${time}</p>
     <p>Temperature: ${temp}</p>
     <p>Wind: ${weather.windspeed} km/h</p>
   `;
@@ -82,19 +102,23 @@ async function loadCities(inputsArray) {
   try {
     for (const input of inputsArray) {
       let location;
-      const latLon = parseLatLon(input);
 
+      const latLon = parseLatLon(input);
       if (latLon) {
-        // User entered lat/lon directly
-        location = { name: `Lat: ${latLon.lat}, Lon: ${latLon.lon}`, ...latLon };
+        // User entered lat/lon
+        location = {
+          name: `Lat: ${latLon.lat}, Lon: ${latLon.lon}`,
+          lat: latLon.lat,
+          lon: latLon.lon,
+          timezone: "UTC"
+        };
       } else {
-        // User entered city name, geocode it
-        const geo = await geocode(input);
-        location = { name: geo.name, lat: geo.latitude, lon: geo.longitude };
+        // User entered city name
+        location = await geocode(input);
       }
 
       const weather = await getWeather(location.lat, location.lon);
-      renderCard(location.name, weather);
+      renderCard(location, weather);
     }
     status.textContent = "";
   } catch (err) {
@@ -103,7 +127,7 @@ async function loadCities(inputsArray) {
   }
 }
 
-// Initialize page with defaults
+// Initialize page with defaults (lat/lon)
 loadCities(defaultLocations.map(loc => `${loc.lat},${loc.lon}`));
 
 // Form submit
