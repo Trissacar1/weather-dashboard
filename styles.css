@@ -135,3 +135,59 @@ button {
     padding: 12px;
   }
 }
+
+/* General card styling */
+.card {
+  background-color: #f8f9fa; /* light gray background */
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* City name styling */
+.card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+/* Local time and weather info */
+.card p {
+  margin: 4px 0;
+  font-size: 1rem;
+}
+
+/* Unknown location card styling */
+.card .error-message {
+  color: #b0b0b0; /* subtle gray */
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Optional: differentiate unknown location slightly */
+.card h2:contains("Unknown location") {
+  color: #888888;
+  font-style: italic;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  #weather-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card {
+    margin: 6px 0;
+    padding: 12px;
+  }
+
+  .controls form {
+    flex-direction: column;
+  }
+
+  input, button {
+    width: 100%;
+    margin-bottom: 6px;
+  }
+}
