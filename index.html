@@ -9,24 +9,26 @@
 <body>
   <header>
     <h1>Weather Together</h1>
-    <p class="note">Note: Only the largest city for a given name will be displayed.</p>
+    <p class="note">Track weather for your friends' cities! Only largest city names are supported.</p>
   </header>
 
   <div class="controls-wrapper">
     <form id="city-form">
-      <input type="text" placeholder="Enter city name" required>
-      <input type="text" placeholder="Enter city name" required>
-      <input type="text" placeholder="Enter city name" required>
-      <button type="submit">Load Weather</button>
+      <input type="text" placeholder="City 1">
+      <input type="text" placeholder="City 2">
+      <input type="text" placeholder="City 3">
+      <button type="submit">Load Cities</button>
     </form>
 
     <div class="toggles">
       <button id="unit-toggle">Show °C</button>
       <button id="theme-toggle" aria-label="Toggle dark mode">🌙 Night Mode</button>
+      <button id="reset-btn">Reset</button>
     </div>
+
+    <div id="status"></div>
   </div>
 
-  <p id="status"></p>
   <div id="weather-container"></div>
 
   <script src="script.js"></script>
