@@ -3,13 +3,14 @@ const container = document.getElementById("weather-container");
 const status = document.getElementById("status");
 const unitToggle = document.getElementById("unit-toggle");
 const themeToggle = document.getElementById("theme-toggle");
+const resetBtn = document.getElementById("reset-btn");
 
 let useFahrenheit = true;
 unitToggle.textContent = "Show °C";
 
-// ------------------------
-// DARK/LIGHT MODE
-// ------------------------
+/* -----------------------
+   DARK/LIGHT MODE
+----------------------- */
 const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 const savedTheme = localStorage.getItem("theme");
 const shouldUseDark = savedTheme ? savedTheme === "dark" : systemPrefersDark;
@@ -28,13 +29,13 @@ themeToggle.addEventListener("click", () => {
   themeToggle.textContent = isDark ? "☀️ Day Mode" : "🌙 Night Mode";
 });
 
-// ------------------------
-// DEFAULT LOCATIONS
-// ------------------------
+/* -----------------------
+   DEFAULT LOCATIONS
+----------------------- */
 const defaultLocations = [
-  { name: "Buffalo, OK", lat: 36.753, lon: -98.108 },
-  { name: "Cedar Park, TX", lat: 30.505, lon: -97.820 },
-  { name: "Bridgeport, CT", lat: 41.186, lon: -73.195 }
+  { name: "Buffalo, OK", lat: 36.753, lon: -98.108, timezone: "America/Chicago" },
+  { name: "Cedar Park, TX", lat: 30.505, lon: -97.820, timezone: "America/Chicago" },
+  { name: "Bridgeport, CT", lat: 41.186, lon: -73.195, timezone: "America/New_York" }
 ];
 
 const inputs = Array.from(form.querySelectorAll("input"));
@@ -42,9 +43,9 @@ defaultLocations.forEach((loc, idx) => {
   if (inputs[idx]) inputs[idx].value = loc.name.split(",")[0];
 });
 
-// ------------------------
-// HELPER FUNCTIONS
-// ------------------------
+/* -----------------------
+   HELPERS
+----------------------- */
 function toF(c) { return (c*9)/5 + 32; }
 
 async function geocode(city) {
@@ -53,7 +54,6 @@ async function geocode(city) {
   if (!res.ok) throw new Error("Geocoding failed");
   const data = await res.json();
   if (!data.results || data.results.length===0) throw new Error("City not found");
-
   const geo = data.results[0];
   let displayName = geo.name;
   if (geo.admin1) displayName += `, ${geo.admin1}`;
@@ -69,14 +69,13 @@ async function getWeather(lat, lon) {
 }
 
 function getLocalTime(timezone) {
-  try {
-    return new Date().toLocaleTimeString("en-US", { timeZone: timezone, hour:"2-digit", minute:"2-digit" });
-  } catch { return "N/A"; }
+  try { return new Date().toLocaleTimeString("en-US",{ timeZone: timezone, hour:"2-digit", minute:"2-digit" }); }
+  catch { return "N/A"; }
 }
 
-// ------------------------
-// RENDER CARD WITH WEATHER ICON + ANIMATED BACKGROUND
-// ------------------------
+/* -----------------------
+   RENDER CARD
+----------------------- */
 function renderCard(location, weather, isError=false) {
   const card = document.createElement("div");
   card.className = "card";
@@ -87,7 +86,6 @@ function renderCard(location, weather, isError=false) {
     const temp = useFahrenheit ? `${toF(weather.temperature).toFixed(1)} °F` : `${weather.temperature} °C`;
     const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
 
-    // Determine day/night
     const hourNum = parseInt(new Date().toLocaleTimeString("en-US",{ timeZone: location.timezone, hour12:false, hour:"2-digit" }));
     const isNight = hourNum < 6 || hourNum >= 18;
 
@@ -100,7 +98,6 @@ function renderCard(location, weather, isError=false) {
     else if ([95,96,99].includes(code)) iconClass = "thunderstorm";
     else iconClass = isNight?"moon":"sunny";
 
-    // Set card class for animated background
     card.classList.add(iconClass);
 
     card.innerHTML = `
@@ -115,40 +112,37 @@ function renderCard(location, weather, isError=false) {
   container.appendChild(card);
 }
 
-// ------------------------
-// LOAD CITIES
-// ------------------------
+/* -----------------------
+   LOAD CITIES
+----------------------- */
 async function loadCities(entries) {
   container.innerHTML = "";
   status.textContent = "Loading...";
-
   for (const entry of entries) {
     try {
       let location;
-      if (entry && typeof entry==="object" && "lat" in entry) location=entry;
-      else if (typeof entry==="string" && entry.length>0) location=await geocode(entry);
+      if (entry && typeof entry==="object" && "lat" in entry) location = entry;
+      else if (typeof entry==="string" && entry.length>0) location = await geocode(entry);
       else throw new Error("Invalid input");
 
       const weather = await getWeather(location.lat, location.lon);
       renderCard(location, weather);
-
     } catch {
       const label = typeof entry==="string"? entry : entry?.name || "Unknown location";
       renderCard(label, null, true);
     }
   }
-
   status.textContent="";
 }
 
-// ------------------------
-// INITIAL LOAD
-// ------------------------
+/* -----------------------
+   INITIAL LOAD
+----------------------- */
 loadCities(defaultLocations);
 
-// ------------------------
-// EVENT HANDLERS
-// ------------------------
+/* -----------------------
+   EVENT HANDLERS
+----------------------- */
 form.addEventListener("submit", (e)=>{
   e.preventDefault();
   const cities = Array.from(form.querySelectorAll("input")).map(i=>i.value.trim());
@@ -160,4 +154,9 @@ unitToggle.addEventListener("click", ()=>{
   unitToggle.textContent = useFahrenheit ? "Show °C" : "Show °F";
   const cities = Array.from(form.querySelectorAll("input")).map(i=>i.value.trim());
   loadCities(cities);
+});
+
+resetBtn.addEventListener("click", ()=>{
+  inputs.forEach((input, idx) => input.value = defaultLocations[idx].name.split(",")[0]);
+  loadCities(defaultLocations);
 });
