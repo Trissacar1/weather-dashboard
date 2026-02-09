@@ -35,7 +35,7 @@ function parseLatLon(input) {
   return null;
 }
 
-// Geocode city name to lat/lon + display name + timezone
+// Geocode city name
 async function geocode(city) {
   const cityParam = encodeURIComponent(city);
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityParam}&count=1`;
@@ -65,8 +65,8 @@ async function reverseGeocode(lat, lon) {
     const data = await res.json();
     if (!data.results || data.results.length === 0) {
       return { 
-        name: `Unknown location (Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)})`,
-        timezone: "UTC"
+        name: `Unknown location`, 
+        timezone: "UTC" 
       };
     }
 
@@ -77,10 +77,7 @@ async function reverseGeocode(lat, lon) {
 
     return { name: displayName, timezone: geo.timezone || "UTC" };
   } catch {
-    return { 
-      name: `Unknown location (Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)})`,
-      timezone: "UTC"
-    };
+    return { name: `Unknown location`, timezone: "UTC" };
   }
 }
 
@@ -104,21 +101,28 @@ function getLocalTime(timezone) {
 }
 
 // Render a single weather card
-function renderCard(location, weather) {
-  const temp = useFahrenheit
-    ? `${toF(weather.temperature).toFixed(1)} °F`
-    : `${weather.temperature} °C`;
-
-  const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
-
+function renderCard(location, weather, isError = false) {
   const card = document.createElement("div");
   card.className = "card";
-  card.innerHTML = `
-    <h2>${location.name}</h2>
-    <p>Local Time: ${time}</p>
-    <p>Temperature: ${temp}</p>
-    <p>Wind: ${weather.windspeed} km/h</p>
-  `;
+
+  if (isError) {
+    card.innerHTML = `
+      <h2>${location}</h2>
+      <p class="error-message">Could not load data for this location.</p>
+    `;
+  } else {
+    const temp = useFahrenheit
+      ? `${toF(weather.temperature).toFixed(1)} °F`
+      : `${weather.temperature} °C`;
+    const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
+    card.innerHTML = `
+      <h2>${location.name}</h2>
+      <p>Local Time: ${time}</p>
+      <p>Temperature: ${temp}</p>
+      <p>Wind: ${weather.windspeed} km/h</p>
+    `;
+  }
+
   container.appendChild(card);
 }
 
@@ -128,14 +132,15 @@ async function loadCities(inputsArray, displayNames = []) {
   status.textContent = "Loading...";
   status.className = "";
 
-  try {
-    for (let i = 0; i < inputsArray.length; i++) {
-      const input = inputsArray[i];
+  // Load each input individually
+  for (let i = 0; i < inputsArray.length; i++) {
+    const input = inputsArray[i];
+    try {
       let location;
-
       const latLon = parseLatLon(input);
+
       if (latLon) {
-        // User entered lat/lon: reverse-geocode to get city name + timezone
+        // Decimal lat/lon input: reverse geocode to nearest city
         const reverse = await reverseGeocode(latLon.lat, latLon.lon);
         location = {
           lat: latLon.lat,
@@ -144,21 +149,23 @@ async function loadCities(inputsArray, displayNames = []) {
           timezone: reverse.timezone
         };
       } else {
-        // User entered city name
+        // City name input
         location = await geocode(input);
       }
 
       const weather = await getWeather(location.lat, location.lon);
       renderCard(location, weather);
+
+    } catch {
+      // Show polished unknown location card
+      renderCard("Unknown location", null, true);
     }
-    status.textContent = "";
-  } catch (err) {
-    status.textContent = err.message;
-    status.className = "error";
   }
+
+  status.textContent = ""; // Clear main status
 }
 
-// Load defaults on page open using lat/lon + stored names
+// Load defaults on page open
 loadCities(
   defaultLocations.map(loc => `${loc.lat},${loc.lon}`),
   defaultLocations.map(loc => loc.name)
