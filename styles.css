@@ -1,35 +1,72 @@
 /* ===========================
-   GENERAL RESET
+   GENERAL RESET & BASE
 =========================== */
-* { box-sizing: border-box; margin:0; padding:0; }
+* { box-sizing:border-box; margin:0; padding:0; }
 body {
-  font-family: "Press Start 2P", cursive, sans-serif;
-  background-color: #f0f4f8;
-  color: #1e293b;
+  position: relative;
   min-height: 100vh;
-  padding: 20px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: "Press Start 2P", cursive;
+  transition: background-color 0.3s, color 0.3s;
+  overflow-x: hidden;
 }
+
+/* ===========================
+   SCENIC 8-BIT CLOUD BACKGROUND
+=========================== */
+body::before {
+  content:"";
+  position:absolute; top:0; left:0;
+  width:100%; height:100%;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.6) 10px, transparent 11px),
+    radial-gradient(circle at 40% 75%, rgba(255,255,255,0.7) 15px, transparent 16px),
+    radial-gradient(circle at 60% 85%, rgba(255,255,255,0.5) 12px, transparent 13px),
+    radial-gradient(circle at 80% 78%, rgba(255,255,255,0.6) 14px, transparent 15px),
+    linear-gradient(to top, #a0d8f1, #ffeaa7);
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index:0;
+  pointer-events:none;
+  animation: driftClouds 60s linear infinite;
+}
+
+body.dark::before {
+  background:
+    radial-gradient(circle at 20% 80%, rgba(200,200,200,0.3) 10px, transparent 11px),
+    radial-gradient(circle at 40% 75%, rgba(220,220,220,0.4) 15px, transparent 16px),
+    radial-gradient(circle at 60% 85%, rgba(180,180,180,0.2) 12px, transparent 13px),
+    radial-gradient(circle at 80% 78%, rgba(200,200,200,0.3) 14px, transparent 15px),
+    linear-gradient(to top, #0f172a, #1e293b);
+}
+
+@keyframes driftClouds {
+  0% { background-position: 0 0; }
+  100% { background-position: 30px 0; }
+}
+
+body > * { position: relative; z-index:1; }
 
 /* ===========================
    HEADER
 =========================== */
-header { text-align: center; margin-bottom: 20px; }
-header h1 { font-size: 2rem; margin-bottom: 5px; }
-.note { font-size: 0.8rem; text-align:center; margin-bottom:20px; color:#475569; }
+header { text-align:center; margin-bottom:20px; }
+header h1 { font-size:2rem; margin-bottom:5px; }
+.note { font-size:0.8rem; color:#475569; margin-bottom:20px; text-align:center; }
 
 /* ===========================
    CONTROLS
 =========================== */
 .controls-wrapper { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; }
 #city-form { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:10px; }
-#city-form input { padding:8px; border:2px solid #94a3b8; border-radius:6px; font-family:inherit; transition:background-color 0.3s, color 0.3s, border-color 0.3s; }
-#city-form button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-family:inherit; background-color:#3b82f6; color:#fff; transition:transform 0.2s, background-color 0.3s; }
+#city-form input { padding:8px; border:2px solid #94a3b8; border-radius:6px; font-family:inherit; transition:0.3s; }
+#city-form button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; background-color:#3b82f6; color:#fff; transition:0.2s; }
 #city-form button:hover { transform:scale(1.05); background-color:#2563eb; }
 
 .toggles { display:flex; gap:10px; margin-bottom:10px; }
-.toggles button { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-family:inherit; background-color:#64748b; color:#fff; transition:transform 0.2s, background-color 0.3s; }
+.toggles button { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-family:inherit; background-color:#64748b; color:#fff; transition:0.2s; }
 .toggles button:hover { transform:scale(1.05); background-color:#475569; }
+
+#status { text-align:center; margin-bottom:15px; font-weight:bold; }
 
 /* ===========================
    WEATHER CARDS
@@ -43,34 +80,23 @@ header h1 { font-size: 2rem; margin-bottom: 5px; }
   width:200px; 
   text-align:center; 
   transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-  font-family:inherit;
   position: relative;
   overflow: hidden;
+  font-family:inherit;
 }
 .card h2 { font-size:1.1rem; margin-bottom:8px; }
 .card p { font-size:0.9rem; margin-bottom:5px; }
 .error-message { color:#dc2626; font-weight:bold; }
 
 /* ===========================
-   STATUS
-=========================== */
-#status { text-align:center; margin-bottom:15px; font-weight:bold; }
-
-/* ===========================
    DARK MODE
 =========================== */
-body.dark { background-color:#0f172a; color:#e5e7eb; }
-body.dark header h1, body.dark header p { color:#e5e7eb; }
+body.dark { color:#e5e7eb; }
 body.dark .note { color:#cbd5f5; }
 body.dark .card { background-color:#1e293b; color:#e5e7eb; border-color:#334155; box-shadow:0 4px 8px rgba(0,0,0,0.4); }
 body.dark input { background-color:#020617; color:#e5e7eb; border:1px solid #334155; }
 body.dark button { background-color:#334155; color:#f8fafc; }
 body.dark button:hover { background-color:#475569; }
-
-/* ===========================
-   TRANSITIONS & ANIMATION
-=========================== */
-body, .card, input, button { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
 
 /* ===========================
    8-BIT WEATHER ICONS
@@ -92,7 +118,7 @@ body, .card, input, button { transition: background-color 0.3s ease, color 0.3s 
 .weather-icon.thunderstorm::before { content:"⚡"; font-size:32px; display:block; animation:cloudDrift 3s linear infinite; }
 
 /* ===========================
-   WEATHER-BASED BACKGROUNDS PER CARD
+   WEATHER-BASED CARD BACKGROUNDS
 =========================== */
 .card.sunny::before {
   content:"";
@@ -140,10 +166,7 @@ body, .card, input, button { transition: background-color 0.3s ease, color 0.3s 
   z-index:-1;
 }
 
-@keyframes lightning {
-  0%, 90%, 100% {background-color: rgba(50,50,70,0.7);}
-  92%, 94% {background-color: rgba(255,255,255,0.9);}
-}
+@keyframes lightning { 0%,90%,100% {background-color: rgba(50,50,70,0.7);} 92%,94% {background-color: rgba(255,255,255,0.9);} }
 
 /* ===========================
    RESPONSIVE
