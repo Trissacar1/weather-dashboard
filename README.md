@@ -18,3 +18,5 @@ conditions for multiple locations simultaneously.
 
 ## Live Demo
 https://trissacar1.github.io/weather-dashboard/
+I'm watching you, Wazowski.. Always watching!
+- Triss
