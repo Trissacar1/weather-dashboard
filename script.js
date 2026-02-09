@@ -3,17 +3,17 @@ const container = document.getElementById("weather-container");
 const status = document.getElementById("status");
 const unitToggle = document.getElementById("unit-toggle");
 
-let useFahrenheit = true; 
-unitToggle.textContent = "Show °C"; 
+let useFahrenheit = true;
+unitToggle.textContent = "Show °C"; // default display
 
-// Hardcoded defaults (order: Buffalo, OK > Cedar Park, TX > Bridgeport, CT)
+// Hardcoded defaults (lat/lon ensures they always load correctly)
 const defaultLocations = [
-  { name: "Buffalo, OK" },
-  { name: "Cedar Park, TX" },
-  { name: "Bridgeport, CT" }
+  { name: "Buffalo, OK", lat: 36.753, lon: -98.108 },
+  { name: "Cedar Park, TX", lat: 30.505, lon: -97.820 },
+  { name: "Bridgeport, CT", lat: 41.186, lon: -73.195 }
 ];
 
-// Pre-fill inputs with default city names
+// Pre-fill inputs with city names (user-facing)
 const inputs = Array.from(form.querySelectorAll("input"));
 defaultLocations.forEach((loc, idx) => {
   if (inputs[idx]) inputs[idx].value = loc.name.split(",")[0];
@@ -22,7 +22,7 @@ defaultLocations.forEach((loc, idx) => {
 // Convert Celsius → Fahrenheit
 function toF(c) { return (c * 9) / 5 + 32; }
 
-// Geocode city name
+// Geocode user-entered city name
 async function geocode(city) {
   const cityParam = encodeURIComponent(city);
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityParam}&count=1`;
@@ -36,11 +36,11 @@ async function geocode(city) {
 
   const geo = data.results[0];
   let displayName = geo.name;
-  if (geo.admin1) displayName += `, ${geo.admin1}`; // city + state only
+  if (geo.admin1) displayName += `, ${geo.admin1}`; // city + state
   return { lat: geo.latitude, lon: geo.longitude, name: displayName, timezone: geo.timezone };
 }
 
-// Fetch current weather
+// Fetch weather
 async function getWeather(lat, lon) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
   const res = await fetch(url);
@@ -59,7 +59,7 @@ function getLocalTime(timezone) {
   }
 }
 
-// Render a weather card
+// Render weather card
 function renderCard(location, weather, isError = false) {
   const card = document.createElement("div");
   card.className = "card";
@@ -92,11 +92,18 @@ async function loadCities(cities) {
   for (let i = 0; i < cities.length; i++) {
     const city = cities[i];
     try {
-      const location = await geocode(city);
+      let location;
+      if (city.lat !== undefined && city.lon !== undefined) {
+        // Use hardcoded default lat/lon
+        location = city;
+      } else {
+        location = await geocode(city);
+      }
+
       const weather = await getWeather(location.lat, location.lon);
       renderCard(location, weather);
     } catch {
-      renderCard("Unknown location", null, true);
+      renderCard(city.name || city, null, true);
     }
   }
 
@@ -104,20 +111,20 @@ async function loadCities(cities) {
 }
 
 // Load defaults on page load
-loadCities(defaultLocations.map(loc => loc.name));
+loadCities(defaultLocations);
 
-// Form submit handler
+// Handle form submit
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   const cities = Array.from(form.querySelectorAll("input")).map(input => input.value.trim());
-  loadCities(cities);
+  loadCities(cities.map(name => ({ name })));
 });
 
-// Unit toggle handler
+// Handle unit toggle
 unitToggle.addEventListener("click", () => {
   useFahrenheit = !useFahrenheit;
   unitToggle.textContent = useFahrenheit ? "Show °C" : "Show °F";
 
   const cities = Array.from(form.querySelectorAll("input")).map(input => input.value.trim());
-  if (cities.every(Boolean)) loadCities(cities);
+  if (cities.every(Boolean)) loadCities(cities.map(name => ({ name })));
 });
