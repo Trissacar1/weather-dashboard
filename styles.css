@@ -92,3 +92,46 @@ button {
 .error {
   color: #b00020;
 }
+
+/* Highlight local time and make fallback subtle */
+.card p:first-of-type {
+  font-weight: bold;
+  color: #2a2a2a;
+}
+
+/* Fallback city display styling */
+.card h2 {
+  margin-bottom: 6px;
+  font-size: 1.2rem;
+}
+
+/* Style unknown locations subtly */
+.card h2:contains("Unknown location") {
+  color: #888888; /* gray to be subtle */
+  font-style: italic;
+}
+
+/* Card text styling */
+.card p {
+  margin: 4px 0;
+  font-size: 1rem;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 600px) {
+  .controls form {
+    flex-direction: column;
+  }
+
+  input, button {
+    width: 100%;
+  }
+
+  #weather-container {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 12px;
+  }
+}
