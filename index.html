@@ -1,27 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weather Together</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Weather Together</h1>
+  <div class="dashboard-wrapper">
+    <header>
+      <h1>Weather Together</h1>
+    </header>
 
-  <div class="controls">
-    <form id="city-form">
-      <input type="text" placeholder="City 1" required />
-      <input type="text" placeholder="City 2" required />
-      <input type="text" placeholder="City 3" required />
-      <button type="submit">Update</button>
-    </form>
+    <div class="controls-wrapper">
+      <form id="city-form">
+        <input type="text" placeholder="City or City, State (optional)" required>
+        <input type="text" placeholder="City or City, State (optional)" required>
+        <input type="text" placeholder="City or City, State (optional)" required>
+        <button type="submit">Load Weather</button>
+      </form>
+      <button id="unit-toggle">Show °C</button>
+      <p class="note">Tip: For ambiguous cities (e.g., Portland), include the state abbreviation: "Portland, OR".</p>
+    </div>
 
-    <button id="unit-toggle">Show °F</button>
+    <div id="weather-container"></div>
+    <div id="status"></div>
   </div>
-
-  <div id="status"></div>
-  <div id="weather-container"></div>
 
   <script src="script.js"></script>
 </body>
