@@ -5,14 +5,39 @@ const unitToggle = document.getElementById("unit-toggle");
 
 let useFahrenheit = false;
 
+// Default locations with lat/lon
+const defaultLocations = [
+  { name: "Buffalo, OK", lat: 36.753, lon: -98.108 },
+  { name: "Bridgeport, CT", lat: 41.186, lon: -73.195 },
+  { name: "Cedar Park, TX", lat: 30.505, lon: -97.820 }
+];
+
+// Pre-fill inputs with default city names
+const inputs = Array.from(form.querySelectorAll("input"));
+defaultLocations.forEach((loc, idx) => {
+  if (inputs[idx]) inputs[idx].value = loc.name.split(",")[0];
+});
+
 // Convert C → F
 function toF(c) {
   return (c * 9) / 5 + 32;
 }
 
+// Detect if input is lat/lon
+function parseLatLon(input) {
+  const parts = input.split(",");
+  if (parts.length === 2) {
+    const lat = parseFloat(parts[0].trim());
+    const lon = parseFloat(parts[1].trim());
+    if (!isNaN(lat) && !isNaN(lon)) return { lat, lon };
+  }
+  return null;
+}
+
 // Fetch lat/lon for a city name
 async function geocode(city) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`;
+  const cityParam = encodeURIComponent(city);
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityParam}&count=1`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Geocoding failed");
 
@@ -20,7 +45,6 @@ async function geocode(city) {
   if (!data.results || data.results.length === 0) {
     throw new Error(`City not found: ${city}`);
   }
-
   return data.results[0];
 }
 
@@ -49,16 +73,27 @@ function renderCard(name, weather) {
   container.appendChild(card);
 }
 
-// Main flow
-async function loadCities(cities) {
+// Main load function
+async function loadCities(inputsArray) {
   container.innerHTML = "";
   status.textContent = "Loading...";
   status.className = "";
 
   try {
-    for (const city of cities) {
-      const location = await geocode(city);
-      const weather = await getWeather(location.latitude, location.longitude);
+    for (const input of inputsArray) {
+      let location;
+      const latLon = parseLatLon(input);
+
+      if (latLon) {
+        // User entered lat/lon directly
+        location = { name: `Lat: ${latLon.lat}, Lon: ${latLon.lon}`, ...latLon };
+      } else {
+        // User entered city name, geocode it
+        const geo = await geocode(input);
+        location = { name: geo.name, lat: geo.latitude, lon: geo.longitude };
+      }
+
+      const weather = await getWeather(location.lat, location.lon);
       renderCard(location.name, weather);
     }
     status.textContent = "";
@@ -67,6 +102,9 @@ async function loadCities(cities) {
     status.className = "error";
   }
 }
+
+// Initialize page with defaults
+loadCities(defaultLocations.map(loc => `${loc.lat},${loc.lon}`));
 
 // Form submit
 form.addEventListener("submit", (e) => {
@@ -85,7 +123,5 @@ unitToggle.addEventListener("click", () => {
   const cities = Array.from(form.querySelectorAll("input")).map(
     (input) => input.value.trim()
   );
-  if (cities.every(Boolean)) {
-    loadCities(cities);
-  }
+  if (cities.every(Boolean)) loadCities(cities);
 });
