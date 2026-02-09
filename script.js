@@ -75,7 +75,7 @@ function getLocalTime(timezone) {
 }
 
 // ------------------------
-// RENDER CARD WITH WEATHER ICON
+// RENDER CARD WITH WEATHER ICON + ANIMATED BACKGROUND
 // ------------------------
 function renderCard(location, weather, isError=false) {
   const card = document.createElement("div");
@@ -100,10 +100,8 @@ function renderCard(location, weather, isError=false) {
     else if ([95,96,99].includes(code)) iconClass = "thunderstorm";
     else iconClass = isNight?"moon":"sunny";
 
-    // Set card background dynamically
-    const bgMapDay = {sunny:"#ffeaa7",cloudy:"#dfe6e9",snow:"#ffffff",thunderstorm:"#636e72"};
-    const bgMapNight = {moon:"#1e293b",cloudy:"#334155",snow:"#1c1c1c",thunderstorm:"#1c1c2e"};
-    card.style.backgroundColor = isNight ? (bgMapNight[iconClass]||"#1e293b") : (bgMapDay[iconClass]||"#e2e8f0");
+    // Set card class for animated background
+    card.classList.add(iconClass);
 
     card.innerHTML = `
       <div class="weather-icon ${iconClass}"></div>
