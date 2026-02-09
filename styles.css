@@ -1,148 +1,155 @@
-/* General reset and layout */
+/* ===========================
+   GENERAL RESET
+=========================== */
+* { box-sizing: border-box; margin:0; padding:0; }
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f4f7f9;
-  color: #333;
-}
-
-.dashboard-wrapper {
-  max-width: 900px;
-  margin: 0 auto;
+  font-family: "Press Start 2P", cursive, sans-serif;
+  background-color: #f0f4f8;
+  color: #1e293b;
+  min-height: 100vh;
   padding: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Header */
-header {
-  text-align: center;
-  margin-bottom: 20px;
+/* ===========================
+   HEADER
+=========================== */
+header { text-align: center; margin-bottom: 20px; }
+header h1 { font-size: 2rem; margin-bottom: 5px; }
+.note { font-size: 0.8rem; text-align:center; margin-bottom:20px; color:#475569; }
+
+/* ===========================
+   CONTROLS
+=========================== */
+.controls-wrapper { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; }
+#city-form { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:10px; }
+#city-form input { padding:8px; border:2px solid #94a3b8; border-radius:6px; font-family:inherit; transition:background-color 0.3s, color 0.3s, border-color 0.3s; }
+#city-form button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-family:inherit; background-color:#3b82f6; color:#fff; transition:transform 0.2s, background-color 0.3s; }
+#city-form button:hover { transform:scale(1.05); background-color:#2563eb; }
+
+.toggles { display:flex; gap:10px; margin-bottom:10px; }
+.toggles button { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-family:inherit; background-color:#64748b; color:#fff; transition:transform 0.2s, background-color 0.3s; }
+.toggles button:hover { transform:scale(1.05); background-color:#475569; }
+
+/* ===========================
+   WEATHER CARDS
+=========================== */
+#weather-container { display:flex; flex-wrap:wrap; justify-content:center; gap:15px; }
+.card { 
+  background-color:#e2e8f0; 
+  border:2px solid #94a3b8; 
+  border-radius:10px; 
+  padding:15px; 
+  width:200px; 
+  text-align:center; 
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  font-family:inherit;
+  position: relative;
+  overflow: hidden;
+}
+.card h2 { font-size:1.1rem; margin-bottom:8px; }
+.card p { font-size:0.9rem; margin-bottom:5px; }
+.error-message { color:#dc2626; font-weight:bold; }
+
+/* ===========================
+   STATUS
+=========================== */
+#status { text-align:center; margin-bottom:15px; font-weight:bold; }
+
+/* ===========================
+   DARK MODE
+=========================== */
+body.dark { background-color:#0f172a; color:#e5e7eb; }
+body.dark header h1, body.dark header p { color:#e5e7eb; }
+body.dark .note { color:#cbd5f5; }
+body.dark .card { background-color:#1e293b; color:#e5e7eb; border-color:#334155; box-shadow:0 4px 8px rgba(0,0,0,0.4); }
+body.dark input { background-color:#020617; color:#e5e7eb; border:1px solid #334155; }
+body.dark button { background-color:#334155; color:#f8fafc; }
+body.dark button:hover { background-color:#475569; }
+
+/* ===========================
+   TRANSITIONS & ANIMATION
+=========================== */
+body, .card, input, button { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+
+/* ===========================
+   8-BIT WEATHER ICONS
+=========================== */
+.weather-icon { width:32px; height:32px; margin:0 auto 8px; position:relative; }
+
+.weather-icon.sunny::before { content:"☀️"; font-size:32px; display:block; animation:sunMove 3s ease-in-out infinite alternate; }
+@keyframes sunMove { 0%{transform:translateX(0) translateY(0);} 50%{transform:translateX(4px) translateY(-2px);} 100%{transform:translateX(0) translateY(0);} }
+
+.weather-icon.moon::before { content:"🌙"; font-size:32px; display:block; animation:moonFloat 4s ease-in-out infinite alternate; }
+@keyframes moonFloat { 0%{transform:translateY(0);} 50%{transform:translateY(-4px);} 100%{transform:translateY(0);} }
+
+.weather-icon.cloudy::before { content:"☁️"; font-size:32px; display:block; animation:cloudDrift 5s linear infinite; }
+@keyframes cloudDrift { 0%{transform:translateX(-4px);} 50%{transform:translateX(4px);} 100%{transform:translateX(-4px);} }
+
+.weather-icon.snow::before { content:"❄️"; font-size:32px; display:block; animation:snowFall 4s linear infinite; }
+@keyframes snowFall { 0%{background-position:0 0;} 100%{background-position:0 100px;} }
+
+.weather-icon.thunderstorm::before { content:"⚡"; font-size:32px; display:block; animation:cloudDrift 3s linear infinite; }
+
+/* ===========================
+   WEATHER-BASED BACKGROUNDS PER CARD
+=========================== */
+.card.sunny::before {
+  content:"";
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background: linear-gradient(to top, #a0d8f1, #ffeaa7);
+  z-index:-1;
 }
 
-header h1 {
-  font-size: 2rem;
-  color: #2c3e50;
+.card.moon::before {
+  content:"";
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background: linear-gradient(to top, #0f172a, #1e293b);
+  z-index:-1;
 }
 
-/* Controls */
-.controls-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
+.card.cloudy::before {
+  content:"";
+  position:absolute; top:20%; left:-10%; width:120%; height:60%;
+  background: repeating-linear-gradient(
+    45deg,
+    #ffffff,
+    #ffffff 2px,
+    #d1d5db 2px,
+    #d1d5db 4px
+  );
+  opacity:0.4;
+  animation: cloudDrift 10s linear infinite;
+  z-index:-1;
 }
 
-#city-form {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
+.card.snow::before {
+  content:"";
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background-image: radial-gradient(white 1px, transparent 1px);
+  background-size: 10px 10px;
+  animation: snowFall 4s linear infinite;
+  z-index:-1;
 }
 
-#city-form input {
-  padding: 10px;
-  font-size: 1rem;
-  width: 200px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+.card.thunderstorm::before {
+  content:"";
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background-color: rgba(50,50,70,0.7);
+  animation: lightning 3s linear infinite;
+  z-index:-1;
 }
 
-#city-form input::placeholder {
-  color: #888;
-  font-style: italic;
+@keyframes lightning {
+  0%, 90%, 100% {background-color: rgba(50,50,70,0.7);}
+  92%, 94% {background-color: rgba(255,255,255,0.9);}
 }
 
-#city-form button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  border: none;
-  background-color: #3498db;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-#city-form button:hover {
-  background-color: #2980b9;
-}
-
-#unit-toggle {
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  border: none;
-  background-color: #2ecc71;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin-bottom: 8px;
-}
-
-#unit-toggle:hover {
-  background-color: #27ae60;
-}
-
-/* User note */
-.note {
-  font-size: 0.85rem;
-  color: #555;
-  text-align: center;
-  max-width: 400px;
-  margin-bottom: 20px;
-}
-
-/* Weather container */
-#weather-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-}
-
-/* Weather cards */
-.card {
-  background-color: white;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  text-align: center;
-  transition: transform 0.2s;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-}
-
-.card h2 {
-  font-size: 1.3rem;
-  margin-bottom: 8px;
-  color: #34495e;
-}
-
-.card p {
-  margin: 4px 0;
-  font-size: 1rem;
-}
-
-.error-message {
-  color: #e74c3c;
-  font-weight: bold;
-}
-
-/* Status text */
-#status {
-  text-align: center;
-  font-size: 1rem;
-  color: #3498db;
-  margin-top: 10px;
-}
-
-/* Responsive tweaks */
-@media (max-width: 500px) {
-  #city-form input {
-    width: 100%;
-  }
-  #unit-toggle {
-    width: 100%;
-  }
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media(max-width:640px){
+  #weather-container { flex-direction:column; align-items:center; }
+  .card { width:90%; }
+  #city-form { flex-direction:column; }
 }
