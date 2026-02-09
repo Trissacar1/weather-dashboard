@@ -17,4 +17,4 @@ conditions for multiple locations simultaneously.
 - GitHub Pages for hosting
 
 ## Live Demo
-https://yourusername.github.io/weather-dashboard/
+https://trissacar1.github.io/weather-dashboard/
