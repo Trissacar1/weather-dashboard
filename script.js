@@ -6,7 +6,7 @@ const unitToggle = document.getElementById("unit-toggle");
 let useFahrenheit = true; // Default to Fahrenheit
 unitToggle.textContent = "Show °C"; // Set button text on load
 
-// Default locations with lat/lon and names
+// Default locations with lat/lon and names (order: Buffalo, OK > Cedar Park, TX > Bridgeport, CT)
 const defaultLocations = [
   { name: "Buffalo, OK", lat: 36.753, lon: -98.108 },
   { name: "Cedar Park, TX", lat: 30.505, lon: -97.820 },
@@ -55,9 +55,9 @@ async function geocode(city) {
   return { lat: geo.latitude, lon: geo.longitude, name: displayName, timezone: geo.timezone };
 }
 
-// Reverse geocode lat/lon to nearest city or fallback
+// Reverse geocode lat/lon using the search endpoint (works reliably for decimals)
 async function reverseGeocode(lat, lon) {
-  const url = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1`;
+  const url = `https://geocoding-api.open-meteo.com/v1/search?latitude=${lat}&longitude=${lon}&count=1`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error();
