@@ -1,159 +1,195 @@
-const form = document.getElementById("city-form");
-const container = document.getElementById("weather-container");
-const status = document.getElementById("status");
-const unitToggle = document.getElementById("unit-toggle");
-
-let useFahrenheit = true;
-unitToggle.textContent = "Show °C";
-
-// Hardcoded defaults (reliable via lat/lon)
-const defaultLocations = [
-  { name: "Buffalo, OK", lat: 36.753, lon: -98.108 },
-  { name: "Cedar Park, TX", lat: 30.505, lon: -97.820 },
-  { name: "Bridgeport, CT", lat: 41.186, lon: -73.195 }
-];
-
-// Pre-fill inputs with city names only
-const inputs = Array.from(form.querySelectorAll("input"));
-defaultLocations.forEach((loc, idx) => {
-  if (inputs[idx]) inputs[idx].value = loc.name.split(",")[0];
-});
-
-// Celsius → Fahrenheit
-function toF(c) {
-  return (c * 9) / 5 + 32;
+/* ===========================
+   GENERAL RESET
+=========================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-// Geocode city name (largest match only)
-async function geocode(city) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Geocoding failed");
-
-  const data = await res.json();
-  if (!data.results || data.results.length === 0) {
-    throw new Error("City not found");
-  }
-
-  const geo = data.results[0];
-  let displayName = geo.name;
-  if (geo.admin1) displayName += `, ${geo.admin1}`;
-
-  return {
-    name: displayName,
-    lat: geo.latitude,
-    lon: geo.longitude,
-    timezone: geo.timezone
-  };
+body {
+  font-family: "Press Start 2P", cursive, sans-serif; /* 8-bit aesthetic */
+  background-color: #f0f4f8;
+  color: #1e293b;
+  min-height: 100vh;
+  padding: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-// Fetch current weather
-async function getWeather(lat, lon) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Weather fetch failed");
-
-  const data = await res.json();
-  return data.current_weather;
+/* ===========================
+   HEADER
+=========================== */
+header {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-// Local time formatting
-function getLocalTime(timezone) {
-  try {
-    return new Date().toLocaleTimeString("en-US", {
-      timeZone: timezone,
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  } catch {
-    return "N/A";
-  }
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 5px;
 }
 
-// Render weather card
-function renderCard(location, weather, isError = false) {
-  const card = document.createElement("div");
-  card.className = "card";
-
-  if (isError) {
-    card.innerHTML = `
-      <h2>${location}</h2>
-      <p class="error-message">Could not load data for this location.</p>
-    `;
-  } else {
-    const temp = useFahrenheit
-      ? `${toF(weather.temperature).toFixed(1)} °F`
-      : `${weather.temperature} °C`;
-
-    const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
-
-    card.innerHTML = `
-      <h2>${location.name}</h2>
-      <p>Local Time: ${time}</p>
-      <p>Temperature: ${temp}</p>
-      <p>Wind: ${weather.windspeed} km/h</p>
-    `;
-  }
-
-  container.appendChild(card);
+.note {
+  font-size: 0.8rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #475569;
 }
 
-// Core loader (handles defaults + user input safely)
-async function loadCities(entries) {
-  container.innerHTML = "";
-  status.textContent = "Loading...";
-
-  for (const entry of entries) {
-    try {
-      let location;
-
-      // Default city (already has lat/lon)
-      if (entry && typeof entry === "object" && "lat" in entry) {
-        location = entry;
-      }
-      // User-entered city (string)
-      else if (typeof entry === "string" && entry.length > 0) {
-        location = await geocode(entry);
-      } else {
-        throw new Error("Invalid input");
-      }
-
-      const weather = await getWeather(location.lat, location.lon);
-      renderCard(location, weather);
-
-    } catch {
-      const label =
-        typeof entry === "string"
-          ? entry
-          : entry?.name || "Unknown location";
-
-      renderCard(label, null, true);
-    }
-  }
-
-  status.textContent = "";
+/* ===========================
+   CONTROLS
+=========================== */
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-// Load defaults on first visit
-loadCities(defaultLocations);
+#city-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
 
-// Handle form submit
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+#city-form input {
+  padding: 8px;
+  border: 2px solid #94a3b8;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
 
-  const cities = Array.from(form.querySelectorAll("input"))
-    .map(input => input.value.trim());
+#city-form button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  background-color: #3b82f6;
+  color: #fff;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
 
-  loadCities(cities);
-});
+#city-form button:hover {
+  transform: scale(1.05);
+  background-color: #2563eb;
+}
 
-// Handle unit toggle
-unitToggle.addEventListener("click", () => {
-  useFahrenheit = !useFahrenheit;
-  unitToggle.textContent = useFahrenheit ? "Show °C" : "Show °F";
+.toggles {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
 
-  const cities = Array.from(form.querySelectorAll("input"))
-    .map(input => input.value.trim());
+.toggles button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  background-color: #64748b;
+  color: #fff;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
 
-  loadCities(cities);
-});
+.toggles button:hover {
+  transform: scale(1.05);
+  background-color: #475569;
+}
+
+/* ===========================
+   WEATHER CARDS
+=========================== */
+#weather-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+.card {
+  background-color: #e2e8f0;
+  border: 2px solid #94a3b8;
+  border-radius: 10px;
+  padding: 15px;
+  width: 200px;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.error-message {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* ===========================
+   STATUS
+=========================== */
+#status {
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* ===========================
+   DARK MODE
+=========================== */
+body.dark {
+  background-color: #0f172a;
+  color: #e5e7eb;
+}
+
+body.dark header h1,
+body.dark header p {
+  color: #e5e7eb;
+}
+
+body.dark .note {
+  color: #cbd5f5;
+}
+
+body.dark .card {
+  background-color: #1e293b;
+  color: #e5e7eb;
+  border-color: #334155;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.dark input {
+  background-color: #020617;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+}
+
+body.dark button {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+body.dark button:hover {
+  background-color: #475569;
+}
+
+/* ===========================
+   TRANSITIONS & ANIMATION
+=========================== */
+body,
+.card,
+input,
+button {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
