@@ -4,56 +4,67 @@ const status = document.getElementById("status");
 const unitToggle = document.getElementById("unit-toggle");
 
 let useFahrenheit = true;
-unitToggle.textContent = "Show °C"; // default display
+unitToggle.textContent = "Show °C";
 
-// Hardcoded defaults (lat/lon ensures they always load correctly)
+// Hardcoded defaults (reliable via lat/lon)
 const defaultLocations = [
   { name: "Buffalo, OK", lat: 36.753, lon: -98.108 },
   { name: "Cedar Park, TX", lat: 30.505, lon: -97.820 },
   { name: "Bridgeport, CT", lat: 41.186, lon: -73.195 }
 ];
 
-// Pre-fill inputs with city names (user-facing)
+// Pre-fill inputs with city names only
 const inputs = Array.from(form.querySelectorAll("input"));
 defaultLocations.forEach((loc, idx) => {
   if (inputs[idx]) inputs[idx].value = loc.name.split(",")[0];
 });
 
-// Convert Celsius → Fahrenheit
-function toF(c) { return (c * 9) / 5 + 32; }
+// Celsius → Fahrenheit
+function toF(c) {
+  return (c * 9) / 5 + 32;
+}
 
-// Geocode user-entered city name
+// Geocode city name (largest match only)
 async function geocode(city) {
-  const cityParam = encodeURIComponent(city);
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityParam}&count=1`;
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Geocoding failed");
 
   const data = await res.json();
   if (!data.results || data.results.length === 0) {
-    throw new Error(`City not found: ${city}`);
+    throw new Error("City not found");
   }
 
   const geo = data.results[0];
   let displayName = geo.name;
-  if (geo.admin1) displayName += `, ${geo.admin1}`; // city + state
-  return { lat: geo.latitude, lon: geo.longitude, name: displayName, timezone: geo.timezone };
+  if (geo.admin1) displayName += `, ${geo.admin1}`;
+
+  return {
+    name: displayName,
+    lat: geo.latitude,
+    lon: geo.longitude,
+    timezone: geo.timezone
+  };
 }
 
-// Fetch weather
+// Fetch current weather
 async function getWeather(lat, lon) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Weather fetch failed");
+
   const data = await res.json();
   return data.current_weather;
 }
 
-// Get local time string
+// Local time formatting
 function getLocalTime(timezone) {
   try {
-    const now = new Date();
-    return now.toLocaleTimeString("en-US", { timeZone: timezone, hour: "2-digit", minute: "2-digit" });
+    return new Date().toLocaleTimeString("en-US", {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   } catch {
     return "N/A";
   }
@@ -70,8 +81,12 @@ function renderCard(location, weather, isError = false) {
       <p class="error-message">Could not load data for this location.</p>
     `;
   } else {
-    const temp = useFahrenheit ? `${toF(weather.temperature).toFixed(1)} °F` : `${weather.temperature} °C`;
+    const temp = useFahrenheit
+      ? `${toF(weather.temperature).toFixed(1)} °F`
+      : `${weather.temperature} °C`;
+
     const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
+
     card.innerHTML = `
       <h2>${location.name}</h2>
       <p>Local Time: ${time}</p>
@@ -83,41 +98,53 @@ function renderCard(location, weather, isError = false) {
   container.appendChild(card);
 }
 
-// Load multiple cities
-async function loadCities(cities) {
+// Core loader (handles defaults + user input safely)
+async function loadCities(entries) {
   container.innerHTML = "";
   status.textContent = "Loading...";
-  status.className = "";
 
-  for (let i = 0; i < cities.length; i++) {
-    const city = cities[i];
+  for (const entry of entries) {
     try {
       let location;
-      if (city.lat !== undefined && city.lon !== undefined) {
-        // Use hardcoded default lat/lon
-        location = city;
+
+      // Default city (already has lat/lon)
+      if (entry && typeof entry === "object" && "lat" in entry) {
+        location = entry;
+      }
+      // User-entered city (string)
+      else if (typeof entry === "string" && entry.length > 0) {
+        location = await geocode(entry);
       } else {
-        location = await geocode(city);
+        throw new Error("Invalid input");
       }
 
       const weather = await getWeather(location.lat, location.lon);
       renderCard(location, weather);
+
     } catch {
-      renderCard(city.name || city, null, true);
+      const label =
+        typeof entry === "string"
+          ? entry
+          : entry?.name || "Unknown location";
+
+      renderCard(label, null, true);
     }
   }
 
   status.textContent = "";
 }
 
-// Load defaults on page load
+// Load defaults on first visit
 loadCities(defaultLocations);
 
 // Handle form submit
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  const cities = Array.from(form.querySelectorAll("input")).map(input => input.value.trim());
-  loadCities(cities.map(name => ({ name })));
+
+  const cities = Array.from(form.querySelectorAll("input"))
+    .map(input => input.value.trim());
+
+  loadCities(cities);
 });
 
 // Handle unit toggle
@@ -125,6 +152,8 @@ unitToggle.addEventListener("click", () => {
   useFahrenheit = !useFahrenheit;
   unitToggle.textContent = useFahrenheit ? "Show °C" : "Show °F";
 
-  const cities = Array.from(form.querySelectorAll("input")).map(input => input.value.trim());
-  if (cities.every(Boolean)) loadCities(cities.map(name => ({ name })));
+  const cities = Array.from(form.querySelectorAll("input"))
+    .map(input => input.value.trim());
+
+  loadCities(cities);
 });
