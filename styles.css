@@ -1,0 +1,59 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+.controls {
+  max-width: 800px;
+  margin: 0 auto 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+input {
+  flex: 1;
+  padding: 8px;
+}
+
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+#status {
+  text-align: center;
+  margin: 10px 0;
+  color: #555;
+}
+
+#weather-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.error {
+  color: #b00020;
+}
