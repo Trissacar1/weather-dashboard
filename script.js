@@ -3,28 +3,22 @@ const container = document.getElementById("weather-container");
 const status = document.getElementById("status");
 const unitToggle = document.getElementById("unit-toggle");
 
-let useFahrenheit = true; // Default to Fahrenheit
-unitToggle.textContent = "Show °C"; // Set button text on load
+let useFahrenheit = true; 
+unitToggle.textContent = "Show °C"; 
 
-// Default locations with lat/lon and names (order: Buffalo, OK > Cedar Park, TX > Bridgeport, CT)
 const defaultLocations = [
   { name: "Buffalo, OK", lat: 36.753, lon: -98.108 },
   { name: "Cedar Park, TX", lat: 30.505, lon: -97.820 },
   { name: "Bridgeport, CT", lat: 41.186, lon: -73.195 }
 ];
 
-// Pre-fill inputs with default city names
 const inputs = Array.from(form.querySelectorAll("input"));
 defaultLocations.forEach((loc, idx) => {
   if (inputs[idx]) inputs[idx].value = loc.name.split(",")[0];
 });
 
-// Convert Celsius → Fahrenheit
-function toF(c) {
-  return (c * 9) / 5 + 32;
-}
+function toF(c) { return (c * 9) / 5 + 32; }
 
-// Detect if input is lat/lon
 function parseLatLon(input) {
   const parts = input.split(",");
   if (parts.length === 2) {
@@ -35,7 +29,6 @@ function parseLatLon(input) {
   return null;
 }
 
-// Geocode city name
 async function geocode(city) {
   const cityParam = encodeURIComponent(city);
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${cityParam}&count=1`;
@@ -49,39 +42,30 @@ async function geocode(city) {
 
   const geo = data.results[0];
   let displayName = geo.name;
-  if (geo.admin1) displayName += `, ${geo.admin1}`;
-  if (geo.country) displayName += `, ${geo.country}`;
-
+  if (geo.admin1) displayName += `, ${geo.admin1}`; // only city + state
   return { lat: geo.latitude, lon: geo.longitude, name: displayName, timezone: geo.timezone };
 }
 
-// Reverse geocode lat/lon using the search endpoint (works reliably for decimals)
 async function reverseGeocode(lat, lon) {
   const url = `https://geocoding-api.open-meteo.com/v1/search?latitude=${lat}&longitude=${lon}&count=1`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error();
-
     const data = await res.json();
+
     if (!data.results || data.results.length === 0) {
-      return { 
-        name: `Unknown location`, 
-        timezone: "UTC" 
-      };
+      return { name: `Unknown location`, timezone: "UTC" };
     }
 
     const geo = data.results[0];
     let displayName = geo.name;
     if (geo.admin1) displayName += `, ${geo.admin1}`;
-    if (geo.country) displayName += `, ${geo.country}`;
-
     return { name: displayName, timezone: geo.timezone || "UTC" };
   } catch {
     return { name: `Unknown location`, timezone: "UTC" };
   }
 }
 
-// Fetch current weather for lat/lon
 async function getWeather(lat, lon) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
   const res = await fetch(url);
@@ -90,7 +74,6 @@ async function getWeather(lat, lon) {
   return data.current_weather;
 }
 
-// Get local time string from timezone
 function getLocalTime(timezone) {
   try {
     const now = new Date();
@@ -100,7 +83,6 @@ function getLocalTime(timezone) {
   }
 }
 
-// Render a single weather card
 function renderCard(location, weather, isError = false) {
   const card = document.createElement("div");
   card.className = "card";
@@ -111,9 +93,7 @@ function renderCard(location, weather, isError = false) {
       <p class="error-message">Could not load data for this location.</p>
     `;
   } else {
-    const temp = useFahrenheit
-      ? `${toF(weather.temperature).toFixed(1)} °F`
-      : `${weather.temperature} °C`;
+    const temp = useFahrenheit ? `${toF(weather.temperature).toFixed(1)} °F` : `${weather.temperature} °C`;
     const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
     card.innerHTML = `
       <h2>${location.name}</h2>
@@ -126,13 +106,11 @@ function renderCard(location, weather, isError = false) {
   container.appendChild(card);
 }
 
-// Load multiple cities (inputsArray: city names or lat/lon strings)
 async function loadCities(inputsArray, displayNames = []) {
   container.innerHTML = "";
   status.textContent = "Loading...";
   status.className = "";
 
-  // Load each input individually
   for (let i = 0; i < inputsArray.length; i++) {
     const input = inputsArray[i];
     try {
@@ -140,7 +118,6 @@ async function loadCities(inputsArray, displayNames = []) {
       const latLon = parseLatLon(input);
 
       if (latLon) {
-        // Decimal lat/lon input: reverse geocode to nearest city
         const reverse = await reverseGeocode(latLon.lat, latLon.lon);
         location = {
           lat: latLon.lat,
@@ -149,36 +126,30 @@ async function loadCities(inputsArray, displayNames = []) {
           timezone: reverse.timezone
         };
       } else {
-        // City name input
         location = await geocode(input);
       }
 
       const weather = await getWeather(location.lat, location.lon);
       renderCard(location, weather);
-
     } catch {
-      // Show polished unknown location card
       renderCard("Unknown location", null, true);
     }
   }
 
-  status.textContent = ""; // Clear main status
+  status.textContent = "";
 }
 
-// Load defaults on page open
 loadCities(
   defaultLocations.map(loc => `${loc.lat},${loc.lon}`),
   defaultLocations.map(loc => loc.name)
 );
 
-// Form submit handler
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   const cities = Array.from(form.querySelectorAll("input")).map(input => input.value.trim());
   loadCities(cities);
 });
 
-// Unit toggle handler
 unitToggle.addEventListener("click", () => {
   useFahrenheit = !useFahrenheit;
   unitToggle.textContent = useFahrenheit ? "Show °C" : "Show °F";
