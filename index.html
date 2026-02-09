@@ -14,13 +14,15 @@
 
     <div class="controls-wrapper">
       <form id="city-form">
-        <input type="text" placeholder="City or City, State (optional)" required>
-        <input type="text" placeholder="City or City, State (optional)" required>
-        <input type="text" placeholder="City or City, State (optional)" required>
+        <input type="text" placeholder="Enter city name" required>
+        <input type="text" placeholder="Enter city name" required>
+        <input type="text" placeholder="Enter city name" required>
         <button type="submit">Load Weather</button>
       </form>
       <button id="unit-toggle">Show °C</button>
-      <p class="note">Tip: For ambiguous cities (e.g., Portland), include the state abbreviation: "Portland, OR".</p>
+      <p class="note">
+        Note: Only the largest city for a given name will be displayed. Smaller or ambiguous cities may not resolve.
+      </p>
     </div>
 
     <div id="weather-container"></div>
