@@ -80,11 +80,25 @@ function getLocalTime(timezone) {
 }
 
 /* -----------------------
-   RENDER CARD
+   CREATE PLACEHOLDER CARDS
 ----------------------- */
-function renderCard(location, weather, isError = false) {
-  const card = document.createElement("div");
-  card.className = "card";
+function initializeCards(count) {
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<div class="weather-icon">⏳</div><h2>Loading...</h2>`;
+    container.appendChild(card);
+  }
+}
+initializeCards(defaultLocations.length);
+
+/* -----------------------
+   UPDATE CARD BY INDEX
+----------------------- */
+function updateCard(index, location, weather, isError = false) {
+  const card = container.children[index];
+  if (!card) return;
 
   if (isError) {
     card.innerHTML = `<h2>${location}</h2><p class="error-message">Could not load data for this location.</p>`;
@@ -95,58 +109,50 @@ function renderCard(location, weather, isError = false) {
     const hourNum = parseInt(new Date().toLocaleTimeString("en-US", { timeZone: location.timezone, hour12: false, hour: "2-digit" }));
     const isNight = hourNum < 6 || hourNum >= 18;
 
-    // Map weather code to icon
-    let iconClass;
+    // Map weather code to emoji
+    let iconEmoji;
     const code = weather.weathercode;
-    if ([0,1,2].includes(code)) iconClass = isNight ? "moon" : "sunny";
-    else if ([3,45,48,51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) iconClass = "cloudy";
-    else if ([71,73,75,77].includes(code)) iconClass = "snow";
-    else if ([95,96,99].includes(code)) iconClass = "thunderstorm";
-    else iconClass = isNight ? "moon" : "sunny";
-
-    card.classList.add(iconClass);
+    if ([0,1,2].includes(code)) iconEmoji = isNight ? "🌙" : "☀️";
+    else if ([3,45,48,51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) iconEmoji = "☁️";
+    else if ([71,73,75,77].includes(code)) iconEmoji = "❄️";
+    else if ([95,96,99].includes(code)) iconEmoji = "⛈️";
+    else iconEmoji = isNight ? "🌙" : "☀️";
 
     card.innerHTML = `
-      <div class="weather-icon ${iconClass}"></div>
+      <div class="weather-icon">${iconEmoji}</div>
       <h2>${location.name}</h2>
       <p class="weather-time">Local Time: ${time}</p>
       <p class="weather-temp">Temperature: ${temp}</p>
       <p class="weather-desc">Wind: ${weather.windspeed} km/h</p>
     `;
   }
-
-  container.appendChild(card);
 }
 
 /* -----------------------
-   LOAD CITIES INDEPENDENTLY
+   LOAD CITIES BY INPUT INDEX
 ----------------------- */
-async function loadCities(entries) {
-  container.innerHTML = "";
+async function loadCitiesByIndex(entries) {
   status.textContent = "Loading...";
-
-  // Create a promises array for all entries
-  const promises = entries.map(async entry => {
+  const promises = entries.map(async (entry, idx) => {
     try {
-      if (!entry || (typeof entry === "string" && entry.trim() === "")) return;
-
       let location;
       if (typeof entry === "object" && "lat" in entry) {
         location = entry;
-      } else if (typeof entry === "string") {
+      } else if (typeof entry === "string" && entry.trim() !== "") {
         location = await geocode(entry);
+      } else {
+        throw new Error("Invalid input");
       }
 
       const weather = await getWeather(location.lat, location.lon);
-      renderCard(location, weather);
+      updateCard(idx, location, weather);
 
     } catch {
       const label = typeof entry === "string" ? entry : entry?.name || "Unknown location";
-      renderCard(label, null, true);
+      updateCard(idx, label, null, true);
     }
   });
 
-  // Wait for all cards to finish independently
   await Promise.all(promises);
   status.textContent = "";
 }
@@ -154,7 +160,7 @@ async function loadCities(entries) {
 /* -----------------------
    INITIAL LOAD
 ----------------------- */
-loadCities(defaultLocations);
+loadCitiesByIndex(defaultLocations);
 
 /* -----------------------
    EVENT HANDLERS
@@ -162,17 +168,17 @@ loadCities(defaultLocations);
 form.addEventListener("submit", e => {
   e.preventDefault();
   const cities = Array.from(form.querySelectorAll("input")).map(i => i.value.trim());
-  loadCities(cities);
+  loadCitiesByIndex(cities);
 });
 
 unitToggle.addEventListener("click", () => {
   useFahrenheit = !useFahrenheit;
   unitToggle.textContent = useFahrenheit ? "Show °C" : "Show °F";
   const cities = Array.from(form.querySelectorAll("input")).map(i => i.value.trim());
-  loadCities(cities);
+  loadCitiesByIndex(cities);
 });
 
 resetBtn.addEventListener("click", () => {
   inputs.forEach((input, idx) => input.value = defaultLocations[idx].name.split(",")[0]);
-  loadCities(defaultLocations);
+  loadCitiesByIndex(defaultLocations);
 });
