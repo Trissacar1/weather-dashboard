@@ -1,6 +1,6 @@
-/* =============================
-   RESET
-============================= */
+/* ==============================
+   GLOBAL RESET
+============================== */
 
 * {
   box-sizing: border-box;
@@ -8,232 +8,216 @@
   padding: 0;
 }
 
-html, body {
-  min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* =============================
-   SCENIC BACKGROUND
-============================= */
-
 body {
+  font-family: "Segoe UI", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  /* DAY BACKGROUND */
   background-image: url("images/Day.jpg");
   background-size: cover;
-  background-position: center bottom;
+  background-position: bottom center;
   background-repeat: no-repeat;
 
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
-
-  color: #1f2937;
 
   transition:
-    background-image 0.6s ease,
+    background-image 0.5s ease,
     background-position 0.6s ease,
     color 0.3s ease;
 
-  overflow-x: hidden;
+  color: #222;
 }
 
+/* NIGHT BACKGROUND */
 body.dark {
   background-image: url("images/Night.jpg");
   background-size: cover;
-  background-position: center calc(100% + 80px);
+  background-position: center 120%; /* Lowered */
   background-repeat: no-repeat;
-
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-
-  color: #e5e7eb;
+  color: #f2f2f2;
 }
 
-/* =============================
-   CENTERED LAYOUT
-============================= */
-
-main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 3rem 1.5rem 4rem;
-  text-align: center;
-}
+/* ==============================
+   HEADER
+============================== */
 
 header {
-  margin-bottom: 2rem;
+  margin-top: 40px;
+  margin-bottom: 25px;
 }
 
-.controls {
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.note {
+  opacity: 0.8;
+}
+
+/* ==============================
+   FORM + CONTROLS
+============================== */
+
+.controls-wrapper {
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 30px;
+  padding: 0 20px;
+}
+
+#city-form {
   display: flex;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 15px;
 }
 
-form {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-}
-
-/* =============================
-   INPUTS + BUTTONS
-============================= */
-
-input[type="text"] {
-  width: 220px;
-  padding: 0.6rem 0.75rem;
-  border-radius: 12px;
+#city-form input {
+  padding: 10px;
+  border-radius: 8px;
   border: none;
-  font-size: 0.9rem;
-
-  background: rgba(255,255,255,0.9);
-  box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  width: 180px;
+  font-size: 0.95rem;
 }
 
-body.dark input[type="text"] {
-  background: rgba(15,23,42,0.9);
-  color: white;
-}
-
-button {
-  padding: 0.6rem 0.9rem;
-  border-radius: 12px;
+#city-form button {
+  padding: 10px 15px;
+  border-radius: 8px;
   border: none;
-  font-size: 0.9rem;
   cursor: pointer;
-
-  background: white;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-
-  transition: transform 0.15s ease;
+  font-weight: 600;
 }
 
-button:hover {
-  transform: translateY(-3px);
+/* ==============================
+   TOGGLES
+============================== */
+
+.toggles {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
-body.dark button {
-  background: #1e293b;
-  color: white;
+.toggles button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* =============================
+.toggles button:hover {
+  transform: translateY(-2px);
+}
+
+/* ==============================
    WEATHER GRID
-============================= */
+============================== */
 
 #weather-container {
+  width: 100%;
+  max-width: 1100px;
+  padding: 20px;
+
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: 25px;
 }
 
-/* =============================
-   WEATHER CARDS (JS uses .card)
-============================= */
+/* ==============================
+   WEATHER CARD
+============================== */
 
 .card {
   position: relative;
-  padding: 1.75rem 1.25rem 1.5rem;
-  border-radius: 20px;
+  padding: 30px 20px;
+  border-radius: 18px;
 
-  background: rgba(255,255,255,0.92);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(6px);
 
-  box-shadow:
-    0 8px 0 rgba(0,0,0,0.3),
-    0 18px 25px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark .card {
+  background: rgba(25, 25, 40, 0.85);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow:
-    0 12px 0 rgba(0,0,0,0.35),
-    0 25px 35px rgba(0,0,0,0.35);
 }
 
-body.dark .card {
-  background: rgba(15,23,42,0.92);
-}
-
-/* =============================
+/* ==============================
    FLOATING WEATHER EMOJI
-============================= */
+============================== */
 
 .weather-icon {
-  position: absolute;
-  top: -20px;
-  right: -10px;
-  font-size: 2.4rem;
-  animation: float 3.5s ease-in-out infinite;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+
+  animation: float 3s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-10px); }
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
   100% { transform: translateY(0px); }
 }
 
-/* =============================
-   CARD TEXT
-============================= */
+/* ==============================
+   TEXT STYLING
+============================== */
 
 .card h2 {
-  font-size: 1.1rem;
-  margin-bottom: 0.4rem;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
 }
 
-.weather-time {
-  font-size: 0.85rem;
-  opacity: 0.8;
-  margin-bottom: 0.8rem;
+.weather-time,
+.weather-temp,
+.weather-desc {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
 }
 
 .weather-temp {
-  font-size: 2.4rem;
   font-weight: bold;
-  margin-bottom: 0.4rem;
-}
-
-.weather-desc {
-  font-size: 0.9rem;
-  opacity: 0.85;
+  font-size: 1.1rem;
 }
 
 .error-message {
-  font-size: 0.9rem;
-  color: #dc2626;
+  color: red;
+  margin-top: 10px;
 }
 
-body.dark .error-message {
-  color: #fca5a5;
+/* ==============================
+   STATUS
+============================== */
+
+#status {
+  margin-top: 8px;
+  min-height: 20px;
+  font-weight: 600;
 }
 
-/* =============================
+/* ==============================
    RESPONSIVE
-============================= */
+============================== */
 
 @media (max-width: 600px) {
-  form {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  button {
+  #city-form input {
     width: 100%;
   }
 }
