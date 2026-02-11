@@ -1,6 +1,6 @@
-/* ==============================
+/* =========================
    GLOBAL RESET
-============================== */
+========================= */
 
 * {
   box-sizing: border-box;
@@ -9,166 +9,230 @@
 }
 
 body {
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Courier New", monospace;
   min-height: 100vh;
+  overflow-x: hidden;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
 
   /* DAY BACKGROUND */
   background-image: url("images/Day.jpg");
   background-size: cover;
-  background-position: bottom center;
+  background-position: center bottom;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 
   image-rendering: pixelated;
 
-  transition:
-    background-image 0.5s ease,
-    background-position 0.6s ease,
-    color 0.3s ease;
-
-  color: #222;
+  color: #1e2a38;
+  transition: background-image 0.6s ease, color 0.3s ease;
 }
 
-/* NIGHT BACKGROUND */
+/* =========================
+   DARK MODE BACKGROUND
+========================= */
+
 body.dark {
   background-image: url("images/Night.jpg");
   background-size: cover;
-  background-position: center 80%; /* Lowered */
+  background-position: center bottom;
   background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  image-rendering: pixelated;
+
   color: #f2f2f2;
 }
 
-/* ==============================
+/* =========================
    HEADER
-============================== */
+========================= */
 
 header {
+  text-align: center;
   margin-top: 40px;
   margin-bottom: 25px;
 }
 
 header h1 {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   margin-bottom: 10px;
+  text-shadow: 2px 2px rgba(0,0,0,0.15);
 }
 
 .note {
+  font-size: 0.9rem;
   opacity: 0.8;
 }
 
-/* ==============================
-   FORM + CONTROLS
-============================== */
+/* =========================
+   CONTROLS WRAPPER
+========================= */
 
 .controls-wrapper {
   width: 100%;
-  max-width: 900px;
-  margin-bottom: 30px;
-  padding: 0 20px;
-}
-
-#city-form {
+  max-width: 850px;
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+form {
+  display: flex;
   flex-wrap: wrap;
-  margin-bottom: 15px;
+  justify-content: center;
+  gap: 12px;
 }
 
-#city-form input {
-  padding: 10px;
+form input {
+  padding: 10px 12px;
   border-radius: 8px;
-  border: none;
-  width: 180px;
-  font-size: 0.95rem;
+  border: 2px solid #cfd8dc;
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 150px;
+  transition: all 0.2s ease;
 }
 
-#city-form button {
-  padding: 10px 15px;
+form input:focus {
+  outline: none;
+  border-color: #5fa8ff;
+}
+
+/* DARK MODE INPUTS */
+
+body.dark form input {
+  background: #1c2433;
+  border: 2px solid #3a4660;
+  color: #f2f2f2;
+}
+
+body.dark form input:focus {
+  border-color: #7da6ff;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+  padding: 10px 14px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
-/* ==============================
-   TOGGLES
-============================== */
+/* Light mode buttons */
 
-.toggles {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
+button {
+  background: #ffffffcc;
+  backdrop-filter: blur(4px);
 }
 
-.toggles button {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.toggles button:hover {
+button:hover {
   transform: translateY(-2px);
 }
 
-/* ==============================
+/* Dark mode buttons */
+
+body.dark button {
+  background: #27324a;
+  color: #f2f2f2;
+}
+
+body.dark button:hover {
+  background: #324061;
+}
+
+/* =========================
+   TOGGLES ROW
+========================= */
+
+.toggles {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* =========================
+   STATUS TEXT
+========================= */
+
+#status {
+  min-height: 24px;
+  font-size: 0.9rem;
+}
+
+/* =========================
    WEATHER GRID
-============================== */
+========================= */
 
 #weather-container {
   width: 100%;
   max-width: 1100px;
-  padding: 20px;
+  margin: 40px auto;
+  padding: 0 20px;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
-/* ==============================
+/* =========================
    WEATHER CARD
-============================== */
+========================= */
 
 .card {
   position: relative;
-  padding: 30px 20px;
+  padding: 28px 20px 22px;
   border-radius: 18px;
 
-  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(6px);
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
 }
 
+/* Light card */
+
+.card {
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* Dark card */
+
 body.dark .card {
-  background: rgba(25, 25, 40, 0.85);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  background: rgba(25,35,55,0.88);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.5);
 }
 
 .card:hover {
   transform: translateY(-6px);
 }
 
-/* ==============================
-   FLOATING WEATHER EMOJI
-============================== */
+/* =========================
+   WEATHER ICON (FLOATING)
+========================= */
 
 .weather-icon {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-
+  font-size: 3.2rem;
+  margin-bottom: 15px;
   animation: float 3s ease-in-out infinite;
 }
+
+/* Floating animation */
 
 @keyframes float {
   0% { transform: translateY(0px); }
@@ -176,48 +240,56 @@ body.dark .card {
   100% { transform: translateY(0px); }
 }
 
-/* ==============================
-   TEXT STYLING
-============================== */
+/* =========================
+   CARD TEXT
+========================= */
 
 .card h2 {
   margin-bottom: 8px;
   font-size: 1.2rem;
 }
 
-.weather-time,
-.weather-temp,
-.weather-desc {
+.weather-time {
+  font-size: 0.9rem;
   margin-bottom: 6px;
-  font-size: 0.95rem;
+  opacity: 0.85;
 }
 
 .weather-temp {
+  font-size: 1.6rem;
   font-weight: bold;
-  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.weather-desc {
+  font-size: 0.9rem;
+  opacity: 0.85;
 }
 
 .error-message {
-  color: red;
   margin-top: 10px;
+  font-size: 0.9rem;
+  color: #d63031;
 }
 
-/* ==============================
-   STATUS
-============================== */
-
-#status {
-  margin-top: 8px;
-  min-height: 20px;
-  font-weight: 600;
+body.dark .error-message {
+  color: #ff7675;
 }
 
-/* ==============================
+/* =========================
    RESPONSIVE
-============================== */
+========================= */
 
 @media (max-width: 600px) {
-  #city-form input {
+  header h1 {
+    font-size: 2rem;
+  }
+
+  form input {
     width: 100%;
+  }
+
+  .toggles {
+    flex-direction: column;
   }
 }
