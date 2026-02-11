@@ -8,10 +8,9 @@ const resetBtn = document.getElementById("reset-btn");
 let useFahrenheit = true;
 unitToggle.textContent = "Show °C";
 
-/* =========================
-   DARK / LIGHT MODE
-========================= */
-
+/* -----------------------
+   DARK/LIGHT MODE
+----------------------- */
 const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 const savedTheme = localStorage.getItem("theme");
 const shouldUseDark = savedTheme ? savedTheme === "dark" : systemPrefersDark;
@@ -30,10 +29,9 @@ themeToggle.addEventListener("click", () => {
   themeToggle.textContent = isDark ? "☀️ Day Mode" : "🌙 Night Mode";
 });
 
-/* =========================
+/* -----------------------
    DEFAULT LOCATIONS
-========================= */
-
+----------------------- */
 const defaultLocations = [
   { name: "Buffalo, OK", lat: 36.753, lon: -98.108, timezone: "America/Chicago" },
   { name: "Cedar Park, TX", lat: 30.505, lon: -97.820, timezone: "America/Chicago" },
@@ -41,123 +39,78 @@ const defaultLocations = [
 ];
 
 const inputs = Array.from(form.querySelectorAll("input"));
-
 defaultLocations.forEach((loc, idx) => {
-  if (inputs[idx]) {
-    inputs[idx].value = loc.name;
-  }
+  if (inputs[idx]) inputs[idx].value = loc.name.split(",")[0];
 });
 
-/* =========================
+/* -----------------------
    HELPERS
-========================= */
-
+----------------------- */
 function toF(c) {
   return (c * 9) / 5 + 32;
-}
-
-function parseLatLon(input) {
-  const parts = input.split(",");
-  if (parts.length === 2) {
-    const lat = parseFloat(parts[0].trim());
-    const lon = parseFloat(parts[1].trim());
-    if (!isNaN(lat) && !isNaN(lon)) {
-      return { lat, lon };
-    }
-  }
-  return null;
 }
 
 async function geocode(city) {
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Geocoding failed");
-
   const data = await res.json();
-  if (!data.results || data.results.length === 0) {
-    throw new Error("City not found");
-  }
+  if (!data.results || data.results.length === 0) throw new Error("City not found");
 
   const geo = data.results[0];
-
   let displayName = geo.name;
-  if (geo.admin1) displayName += `, ${geo.admin1}`;
-
-  return {
-    name: displayName,
-    lat: geo.latitude,
-    lon: geo.longitude,
-    timezone: geo.timezone
-  };
+  if (geo.admin1) displayName += `, ${geo.admin1}`; // omit country
+  return { name: displayName, lat: geo.latitude, lon: geo.longitude, timezone: geo.timezone };
 }
 
 async function getWeather(lat, lon) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Weather fetch failed");
-
   const data = await res.json();
   return data.current_weather;
 }
 
 function getLocalTime(timezone) {
   try {
-    return new Date().toLocaleTimeString("en-US", {
-      timeZone: timezone,
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    return new Date().toLocaleTimeString("en-US", { timeZone: timezone, hour: "2-digit", minute: "2-digit" });
   } catch {
     return "N/A";
   }
 }
 
-function getEmoji(weatherCode, timezone) {
-  const hour = parseInt(
-    new Date().toLocaleTimeString("en-US", {
-      timeZone: timezone,
-      hour12: false,
-      hour: "2-digit"
-    })
-  );
-
-  const isNight = hour < 6 || hour >= 18;
-
-  if ([0, 1].includes(weatherCode)) return isNight ? "🌙" : "☀️";
-  if ([2, 3, 45, 48].includes(weatherCode)) return "☁️";
-  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weatherCode)) return "🌧️";
-  if ([71, 73, 75, 77].includes(weatherCode)) return "❄️";
-  if ([95, 96, 99].includes(weatherCode)) return "⛈️";
-
-  return isNight ? "🌙" : "☀️";
-}
-
-/* =========================
+/* -----------------------
    RENDER CARD
-========================= */
-
+----------------------- */
 function renderCard(location, weather, isError = false) {
   const card = document.createElement("div");
   card.className = "card";
 
   if (isError) {
-    card.innerHTML = `
-      <h2>${location}</h2>
-      <p class="error-message">Could not load data for this location.</p>
-    `;
+    card.innerHTML = `<h2>${location}</h2><p class="error-message">Could not load data for this location.</p>`;
   } else {
-    const temp = useFahrenheit
-      ? `${toF(weather.temperature).toFixed(1)} °F`
-      : `${weather.temperature} °C`;
+    const temp = useFahrenheit ? `${toF(weather.temperature).toFixed(1)} °F` : `${weather.temperature} °C`;
+    const time = location.timezone ? getLocalTime(location.timezone) : "N/A";
 
-    const time = getLocalTime(location.timezone);
-    const emoji = getEmoji(weather.weathercode, location.timezone);
+    const hourNum = parseInt(new Date().toLocaleTimeString("en-US", { timeZone: location.timezone, hour12: false, hour: "2-digit" }));
+    const isNight = hourNum < 6 || hourNum >= 18;
+
+    // Map weather code to icon
+    let iconClass;
+    const code = weather.weathercode;
+    if ([0,1,2].includes(code)) iconClass = isNight ? "moon" : "sunny";
+    else if ([3,45,48,51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) iconClass = "cloudy";
+    else if ([71,73,75,77].includes(code)) iconClass = "snow";
+    else if ([95,96,99].includes(code)) iconClass = "thunderstorm";
+    else iconClass = isNight ? "moon" : "sunny";
+
+    card.classList.add(iconClass);
 
     card.innerHTML = `
-      <div class="weather-icon">${emoji}</div>
+      <div class="weather-icon ${iconClass}"></div>
       <h2>${location.name}</h2>
       <p class="weather-time">Local Time: ${time}</p>
-      <p class="weather-temp">${temp}</p>
+      <p class="weather-temp">Temperature: ${temp}</p>
       <p class="weather-desc">Wind: ${weather.windspeed} km/h</p>
     `;
   }
@@ -165,78 +118,61 @@ function renderCard(location, weather, isError = false) {
   container.appendChild(card);
 }
 
-/* =========================
-   LOAD CITIES
-========================= */
-
+/* -----------------------
+   LOAD CITIES INDEPENDENTLY
+----------------------- */
 async function loadCities(entries) {
   container.innerHTML = "";
   status.textContent = "Loading...";
 
-  for (const entry of entries) {
+  // Create a promises array for all entries
+  const promises = entries.map(async entry => {
     try {
-      let location;
+      if (!entry || (typeof entry === "string" && entry.trim() === "")) return;
 
-      if (entry && typeof entry === "object" && "lat" in entry) {
+      let location;
+      if (typeof entry === "object" && "lat" in entry) {
         location = entry;
-      } else if (typeof entry === "string" && entry.length > 0) {
-        const latLon = parseLatLon(entry);
-        if (latLon) {
-          location = {
-            name: entry,
-            lat: latLon.lat,
-            lon: latLon.lon,
-            timezone: "UTC"
-          };
-        } else {
-          location = await geocode(entry);
-        }
-      } else {
-        throw new Error("Invalid input");
+      } else if (typeof entry === "string") {
+        location = await geocode(entry);
       }
 
       const weather = await getWeather(location.lat, location.lon);
       renderCard(location, weather);
 
     } catch {
-      const label =
-        typeof entry === "string"
-          ? entry
-          : entry?.name || "Unknown location";
-
+      const label = typeof entry === "string" ? entry : entry?.name || "Unknown location";
       renderCard(label, null, true);
     }
-  }
+  });
 
+  // Wait for all cards to finish independently
+  await Promise.all(promises);
   status.textContent = "";
 }
 
-/* =========================
+/* -----------------------
    INITIAL LOAD
-========================= */
-
+----------------------- */
 loadCities(defaultLocations);
 
-/* =========================
+/* -----------------------
    EVENT HANDLERS
-========================= */
-
-form.addEventListener("submit", (e) => {
+----------------------- */
+form.addEventListener("submit", e => {
   e.preventDefault();
-  const cities = inputs.map(i => i.value.trim());
+  const cities = Array.from(form.querySelectorAll("input")).map(i => i.value.trim());
   loadCities(cities);
 });
 
 unitToggle.addEventListener("click", () => {
   useFahrenheit = !useFahrenheit;
   unitToggle.textContent = useFahrenheit ? "Show °C" : "Show °F";
-  const cities = inputs.map(i => i.value.trim());
+  const cities = Array.from(form.querySelectorAll("input")).map(i => i.value.trim());
   loadCities(cities);
 });
 
 resetBtn.addEventListener("click", () => {
-  defaultLocations.forEach((loc, idx) => {
-    if (inputs[idx]) inputs[idx].value = loc.name;
-  });
+  inputs.forEach((input, idx) => input.value = defaultLocations[idx].name.split(",")[0]);
   loadCities(defaultLocations);
 });
