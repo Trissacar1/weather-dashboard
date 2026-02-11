@@ -22,7 +22,7 @@ A browser-based web application that displays **live weather conditions** for mu
 ## Live Demo
 [Try it in your browser](https://trissacar1.github.io/weather-dashboard/)
 
-![Dashboard Demo](images/DashboardGIF.gif)
+![Dashboard Demo](images/DashboardGIF2.gif)<br>
 
-> Built with **AI-assisted coding**.  
-> ~ LTC
+Built with **AI-assisted coding**.  
+~ Triss
