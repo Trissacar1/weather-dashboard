@@ -39,7 +39,7 @@ body {
 body.dark {
   background-image: url("images/Night.jpg");
   background-size: cover;
-  background-position: center calc(100% + 100px);
+  background-position: center calc(100% + 80px);
   background-repeat: no-repeat;
 
   image-rendering: pixelated;
@@ -49,7 +49,7 @@ body.dark {
 }
 
 /* =============================
-   MAIN CENTERED LAYOUT
+   CENTERED LAYOUT
 ============================= */
 
 main {
@@ -62,10 +62,6 @@ main {
 header {
   margin-bottom: 2rem;
 }
-
-/* =============================
-   CONTROLS ROW
-============================= */
 
 .controls {
   display: flex;
@@ -83,10 +79,14 @@ form {
   margin-bottom: 1.5rem;
 }
 
+/* =============================
+   INPUTS + BUTTONS
+============================= */
+
 input[type="text"] {
   width: 220px;
   padding: 0.6rem 0.75rem;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
   font-size: 0.9rem;
 
@@ -101,7 +101,7 @@ body.dark input[type="text"] {
 
 button {
   padding: 0.6rem 0.9rem;
-  border-radius: 10px;
+  border-radius: 12px;
   border: none;
   font-size: 0.9rem;
   cursor: pointer;
@@ -133,13 +133,13 @@ body.dark button {
 }
 
 /* =============================
-   WEATHER TILES
+   WEATHER CARDS (JS uses .card)
 ============================= */
 
-.weather-card {
+.card {
   position: relative;
   padding: 1.75rem 1.25rem 1.5rem;
-  border-radius: 18px;
+  border-radius: 20px;
 
   background: rgba(255,255,255,0.92);
   backdrop-filter: blur(6px);
@@ -154,14 +154,14 @@ body.dark button {
     background 0.3s ease;
 }
 
-.weather-card:hover {
+.card:hover {
   transform: translateY(-6px);
   box-shadow:
     0 12px 0 rgba(0,0,0,0.35),
     0 25px 35px rgba(0,0,0,0.35);
 }
 
-body.dark .weather-card {
+body.dark .card {
   background: rgba(15,23,42,0.92);
 }
 
@@ -173,27 +173,27 @@ body.dark .weather-card {
   position: absolute;
   top: -20px;
   right: -10px;
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   animation: float 3.5s ease-in-out infinite;
 }
 
 @keyframes float {
   0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-8px); }
+  50%  { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
 }
 
 /* =============================
-   CARD CONTENT
+   CARD TEXT
 ============================= */
 
-.weather-card h2 {
+.card h2 {
   font-size: 1.1rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.4rem;
 }
 
 .weather-time {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   opacity: 0.8;
   margin-bottom: 0.8rem;
 }
@@ -209,12 +209,12 @@ body.dark .weather-card {
   opacity: 0.85;
 }
 
-.weather-error {
-  font-size: 0.85rem;
+.error-message {
+  font-size: 0.9rem;
   color: #dc2626;
 }
 
-body.dark .weather-error {
+body.dark .error-message {
   color: #fca5a5;
 }
 
