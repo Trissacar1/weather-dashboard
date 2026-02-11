@@ -31,7 +31,12 @@ body {
 /* NIGHT BACKGROUND */
 body.dark {
   background-image: url("images/Night.jpg");
-  color: #e5e7eb;
+  background-size: cover;
+  background-position: center 105%;
+  background-repeat: no-repeat;
+
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
 }
 
 /* ===========================
