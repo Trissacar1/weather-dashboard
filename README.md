@@ -5,24 +5,24 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript) 
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-000000?style=flat&logo=github&logoColor=white)](https://pages.github.com/)
 
-A browser-based web application that displays **live weather conditions** for multiple locations simultaneously.
+A browser-based web application that displays live weather conditions for multiple locations simultaneously.
 
 ## Features
-- Fetches live weather data from the **Open-Meteo API**
-- Displays **current temperature** and **wind speed** for multiple locations
-- Built with **vanilla HTML, CSS, and JavaScript**
 - **No backend or API keys required**
 - Responsive and easy to use in any modern browser
+- Built with **vanilla HTML, CSS, and JavaScript**
+- Fetches live weather data from the **Open-Meteo API**
+-  **AI-assisted development** to accelerate coding and problem-solving
+- Displays current temperature, time, and wind speed for multiple locations
 
 ## Tech Stack
 - **HTML | CSS | JavaScript**
 - **Open-Meteo API**
 - **GitHub Pages** for hosting
 
-## Live Demo
-[Try it in your browser](https://trissacar1.github.io/weather-dashboard/)
+## Try It Now
+✨ [Open the Weather Dashboard](https://trissacar1.github.io/weather-dashboard/)
 
-![Dashboard Demo](images/DashboardGIF2.gif)<br>
-
-Built with **AI-assisted coding**.  
+![Dashboard Demo](images/DashboardGIF2.gif)<br/>
+ 
 ~ Triss
