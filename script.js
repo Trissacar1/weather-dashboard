@@ -100,13 +100,31 @@ function renderCard(location, weather, isError=false) {
 
     card.classList.add(iconClass);
 
-    card.innerHTML = `
-      <div class="weather-icon ${iconClass}"></div>
-      <h2>${location.name}</h2>
-      <p>Local Time: ${time}</p>
-      <p>Temperature: ${temp}</p>
-      <p>Wind: ${weather.windspeed} km/h</p>
-    `;
+    let emoji;
+
+if (iconClass === "sunny") emoji = "☀️";
+else if (iconClass === "moon") emoji = "🌙";
+else if (iconClass === "cloudy") emoji = "☁️";
+else if (iconClass === "snow") emoji = "❄️";
+else if (iconClass === "thunderstorm") emoji = "⛈️";
+else emoji = "☀️";
+
+let emoji;
+
+if (iconClass === "sunny") emoji = "☀️";
+else if (iconClass === "moon") emoji = "🌙";
+else if (iconClass === "cloudy") emoji = "☁️";
+else if (iconClass === "snow") emoji = "❄️";
+else if (iconClass === "thunderstorm") emoji = "⛈️";
+else emoji = "☀️";
+
+card.innerHTML = `
+  <div class="weather-icon">${emoji}</div>
+  <h2>${location.name}</h2>
+  <p class="weather-time">Local Time: ${time}</p>
+  <p class="weather-temp">${temp}</p>
+  <p class="weather-desc">Wind: ${weather.windspeed} km/h</p>
+`;
   }
 
   container.appendChild(card);
