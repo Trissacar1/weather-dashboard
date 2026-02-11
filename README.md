@@ -21,7 +21,7 @@ A browser-based web application that displays live weather conditions for multip
 - **GitHub Pages** for hosting
 
 ## Try It Now
-✨ [Open the Weather Dashboard](https://trissacar1.github.io/weather-dashboard/)
+✨ [Open the Weather Together Dashboard](https://trissacar1.github.io/weather-dashboard/)
 
 ![Dashboard Demo](images/DashboardGIF2.gif)<br/>
  
