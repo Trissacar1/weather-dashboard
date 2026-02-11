@@ -122,7 +122,7 @@ function updateCard(index, location, weather, isError = false) {
       <div class="weather-icon">${iconEmoji}</div>
       <h2>${location.name}</h2>
       <p class="weather-time">Local Time: ${time}</p>
-      <p class="weather-temp">Temperature: ${temp}</p>
+      <p class="weather-temp"> ${temp}</p>
       <p class="weather-desc">Wind: ${weather.windspeed} km/h</p>
     `;
   }
