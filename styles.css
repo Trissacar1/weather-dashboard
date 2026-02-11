@@ -37,7 +37,7 @@ body {
 body.dark {
   background-image: url("images/Night.jpg");
   background-size: cover;
-  background-position: center 200px;
+  background-position: center 40px;
   background-repeat: no-repeat;
   background-attachment: fixed;
 
