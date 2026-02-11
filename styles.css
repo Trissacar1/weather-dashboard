@@ -36,7 +36,7 @@ body {
 body.dark {
   background-image: url("images/Night.jpg");
   background-size: cover;
-  background-position: center 120%; /* Lowered */
+  background-position: center 80%; /* Lowered */
   background-repeat: no-repeat;
   color: #f2f2f2;
 }
