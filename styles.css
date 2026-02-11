@@ -1,230 +1,237 @@
 /* ===========================
-   GENERAL RESET & BASE
+   RESET & BASE
 =========================== */
-* { box-sizing:border-box; margin:0; padding:0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  position: relative;
   min-height: 100vh;
-  font-family: "Press Start 2P", cursive;
-  transition: background-color 0.3s, color 0.3s;
+  font-family: "Press Start 2P", monospace;
+  color: #1f2937;
+
+  /* DAY BACKGROUND */
+  background-image: url("images/Day.jpg");
+  background-size: cover;
+  background-position: bottom;
+  background-repeat: no-repeat;
+
+  /* 8-bit pixel look */
+  image-rendering: pixelated;
+
+  transition:
+    background-image 0.5s ease,
+    color 0.3s ease;
+
   overflow-x: hidden;
 }
 
-/* ===========================
-   SCENIC 8-BIT CLOUD BACKGROUND
-   - Bottom-heavy clouds
-   - Wisps at the top
-   - No repeated tiling
-=========================== */
-body::before {
-  content:"";
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  z-index:0;
-  pointer-events:none;
-
-  background:
-    /* bottom clouds */
-    radial-gradient(circle at 10% 85%, #fff 40px, transparent 41px),
-    radial-gradient(circle at 30% 88%, #f0f0f0 50px, transparent 51px),
-    radial-gradient(circle at 55% 82%, #e0e0e0 45px, transparent 46px),
-    radial-gradient(circle at 75% 87%, #f8f8f8 55px, transparent 56px),
-    radial-gradient(circle at 90% 84%, #f2f2f2 40px, transparent 41px),
-    /* top wisps */
-    radial-gradient(circle at 15% 20%, rgba(255,255,255,0.3) 15px, transparent 16px),
-    radial-gradient(circle at 50% 15%, rgba(255,255,255,0.2) 20px, transparent 21px),
-    radial-gradient(circle at 80% 25%, rgba(255,255,255,0.25) 10px, transparent 11px),
-    /* sky gradient behind clouds */
-    linear-gradient(to top, #a0d8f1, #ffeaa7);
-  background-repeat: no-repeat;
-  background-size: cover;
-  animation: driftClouds 60s linear infinite;
+/* NIGHT BACKGROUND */
+body.dark {
+  background-image: url("images/Night.jpg");
+  color: #e5e7eb;
 }
-
-/* Dark mode scenic clouds */
-body.dark::before {
-  background:
-    radial-gradient(circle at 10% 85%, #bbb 40px, transparent 41px),
-    radial-gradient(circle at 30% 88%, #999 50px, transparent 51px),
-    radial-gradient(circle at 55% 82%, #888 45px, transparent 46px),
-    radial-gradient(circle at 75% 87%, #aaa 55px, transparent 56px),
-    radial-gradient(circle at 90% 84%, #ccc 40px, transparent 41px),
-    radial-gradient(circle at 15% 20%, rgba(220,220,220,0.2) 15px, transparent 16px),
-    radial-gradient(circle at 50% 15%, rgba(200,200,200,0.15) 20px, transparent 21px),
-    radial-gradient(circle at 80% 25%, rgba(230,230,230,0.2) 10px, transparent 11px),
-    linear-gradient(to top, #0f172a, #1e293b);
-}
-
-@keyframes driftClouds {
-  0% { background-position: 0 0; }
-  100% { background-position: 30px 0; }
-}
-
-body > * { position: relative; z-index:1; }
 
 /* ===========================
    HEADER
 =========================== */
-header { text-align:center; margin-bottom:20px; }
-header h1 { font-size:2rem; margin-bottom:5px; }
-.note { font-size:0.8rem; color:#475569; margin-bottom:20px; text-align:center; }
+header {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.note {
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
 
 /* ===========================
    CONTROLS
 =========================== */
-.controls-wrapper { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; }
-#city-form { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:10px; }
-#city-form input { padding:8px; border:2px solid #94a3b8; border-radius:6px; font-family:inherit; transition:0.3s; }
-#city-form button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; background-color:#3b82f6; color:#fff; transition:0.2s; }
-#city-form button:hover { transform:scale(1.05); background-color:#2563eb; }
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
 
-.toggles { display:flex; gap:10px; margin-bottom:10px; }
-.toggles button { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-family:inherit; background-color:#64748b; color:#fff; transition:0.2s; }
-.toggles button:hover { transform:scale(1.05); background-color:#475569; }
+#city-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
 
-#status { text-align:center; margin-bottom:15px; font-weight:bold; }
+#city-form input {
+  padding: 8px;
+  border: 2px solid #64748b;
+  border-radius: 6px;
+  font-family: inherit;
+  width: 180px;
+}
+
+#city-form button {
+  padding: 8px 12px;
+  font-family: inherit;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #3b82f6;
+  color: white;
+}
+
+#city-form button:hover {
+  transform: scale(1.05);
+}
+
+.toggles {
+  display: flex;
+  gap: 10px;
+}
+
+.toggles button {
+  padding: 8px 12px;
+  font-family: inherit;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #475569;
+  color: white;
+}
+
+.toggles button:hover {
+  transform: scale(1.05);
+}
+
+#status {
+  min-height: 20px;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* ===========================
+   WEATHER CONTAINER
+=========================== */
+#weather-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 20px;
+}
 
 /* ===========================
    WEATHER CARDS
 =========================== */
-#weather-container { display:flex; flex-wrap:wrap; justify-content:center; gap:15px; }
-.card { 
-  background-color:#e2e8f0; 
-  border:2px solid #94a3b8; 
-  border-radius:10px; 
-  padding:15px; 
-  width:200px; 
-  text-align:center; 
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+.card {
+  width: 220px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 3px solid #64748b;
+  background: rgba(255, 255, 255, 0.88);
+  text-align: center;
   position: relative;
   overflow: hidden;
-  font-family:inherit;
+
+  transition: transform 0.2s, background 0.3s;
 }
-.card h2 { font-size:1.1rem; margin-bottom:8px; }
-.card p { font-size:0.9rem; margin-bottom:5px; }
-.error-message { color:#dc2626; font-weight:bold; }
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+body.dark .card {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: #334155;
+}
+
+.card h2 {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+}
 
 /* ===========================
-   DRIFTING CLOUDS INSIDE CARDS
+   WEATHER ICONS (8-bit vibe)
+=========================== */
+.weather-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.sunny::before { content: "☀️"; }
+.moon::before { content: "🌙"; }
+.cloudy::before { content: "☁️"; }
+.snow::before { content: "❄️"; }
+.thunderstorm::before { content: "⚡"; }
+
+/* ===========================
+   SUBTLE CLOUD DRIFT INSIDE CARDS
 =========================== */
 .card::after {
-  content:"";
-  position:absolute;
-  top:10%;
-  left:-20%;
-  width:150%;
-  height:50%;
+  content: "";
+  position: absolute;
+  bottom: 10%;
+  left: -20%;
+  width: 150%;
+  height: 40%;
+  pointer-events: none;
+
   background:
-    radial-gradient(circle at 10% 70%, rgba(255,255,255,0.6) 15px, transparent 16px),
-    radial-gradient(circle at 30% 60%, rgba(255,255,255,0.5) 12px, transparent 13px),
-    radial-gradient(circle at 60% 65%, rgba(255,255,255,0.4) 10px, transparent 11px),
-    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.5) 14px, transparent 15px);
-  background-repeat: no-repeat;
-  z-index:0;
-  pointer-events:none;
-  animation: cardCloudDrift 20s linear infinite;
-  opacity:0.4;
+    radial-gradient(circle at 20% 60%, rgba(255,255,255,0.35) 18px, transparent 19px),
+    radial-gradient(circle at 40% 55%, rgba(255,255,255,0.3) 14px, transparent 15px),
+    radial-gradient(circle at 70% 65%, rgba(255,255,255,0.25) 16px, transparent 17px);
+
+  animation: cloud-drift 18s linear infinite;
 }
 
 body.dark .card::after {
   background:
-    radial-gradient(circle at 10% 70%, rgba(200,200,200,0.3) 15px, transparent 16px),
-    radial-gradient(circle at 30% 60%, rgba(180,180,180,0.25) 12px, transparent 13px),
-    radial-gradient(circle at 60% 65%, rgba(150,150,150,0.2) 10px, transparent 11px),
-    radial-gradient(circle at 80% 70%, rgba(180,180,180,0.25) 14px, transparent 15px);
+    radial-gradient(circle at 20% 60%, rgba(200,200,200,0.2) 18px, transparent 19px),
+    radial-gradient(circle at 40% 55%, rgba(180,180,180,0.18) 14px, transparent 15px),
+    radial-gradient(circle at 70% 65%, rgba(160,160,160,0.15) 16px, transparent 17px);
 }
 
-@keyframes cardCloudDrift {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(20px); }
+@keyframes cloud-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(30px); }
 }
 
 /* ===========================
-   DARK MODE
+   ERROR STATE
 =========================== */
-body.dark { color:#e5e7eb; }
-body.dark .note { color:#cbd5f5; }
-body.dark .card { background-color:#1e293b; color:#e5e7eb; border-color:#334155; box-shadow:0 4px 8px rgba(0,0,0,0.4); }
-body.dark input { background-color:#020617; color:#e5e7eb; border:1px solid #334155; }
-body.dark button { background-color:#334155; color:#f8fafc; }
-body.dark button:hover { background-color:#475569; }
-
-/* ===========================
-   8-BIT WEATHER ICONS
-=========================== */
-.weather-icon { width:32px; height:32px; margin:0 auto 8px; position:relative; }
-
-.weather-icon.sunny::before { content:"☀️"; font-size:32px; display:block; animation:sunMove 3s ease-in-out infinite alternate; }
-@keyframes sunMove { 0%{transform:translateX(0) translateY(0);} 50%{transform:translateX(4px) translateY(-2px);} 100%{transform:translateX(0) translateY(0);} }
-
-.weather-icon.moon::before { content:"🌙"; font-size:32px; display:block; animation:moonFloat 4s ease-in-out infinite alternate; }
-@keyframes moonFloat { 0%{transform:translateY(0);} 50%{transform:translateY(-4px);} 100%{transform:translateY(0);} }
-
-.weather-icon.cloudy::before { content:"☁️"; font-size:32px; display:block; animation:cloudDrift 5s linear infinite; }
-@keyframes cloudDrift { 0%{transform:translateX(-4px);} 50%{transform:translateX(4px);} 100%{transform:translateX(-4px);} }
-
-.weather-icon.snow::before { content:"❄️"; font-size:32px; display:block; animation:snowFall 4s linear infinite; }
-@keyframes snowFall { 0%{background-position:0 0;} 100%{background-position:0 100px;} }
-
-.weather-icon.thunderstorm::before { content:"⚡"; font-size:32px; display:block; animation:cloudDrift 3s linear infinite; }
-
-/* ===========================
-   WEATHER-BASED CARD BACKGROUNDS
-=========================== */
-.card.sunny::before {
-  content:"";
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  background: linear-gradient(to top, #a0d8f1, #ffeaa7);
-  z-index:-1;
+.error-message {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 6px;
 }
-
-.card.moon::before {
-  content:"";
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  background: linear-gradient(to top, #0f172a, #1e293b);
-  z-index:-1;
-}
-
-.card.cloudy::before {
-  content:"";
-  position:absolute; top:20%; left:-10%; width:120%; height:60%;
-  background: repeating-linear-gradient(
-    45deg,
-    #ffffff,
-    #ffffff 2px,
-    #d1d5db 2px,
-    #d1d5db 4px
-  );
-  opacity:0.4;
-  animation: cloudDrift 10s linear infinite;
-  z-index:-1;
-}
-
-.card.snow::before {
-  content:"";
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  background-image: radial-gradient(white 1px, transparent 1px);
-  background-size: 10px 10px;
-  animation: snowFall 4s linear infinite;
-  z-index:-1;
-}
-
-.card.thunderstorm::before {
-  content:"";
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  background-color: rgba(50,50,70,0.7);
-  animation: lightning 3s linear infinite;
-  z-index:-1;
-}
-
-@keyframes lightning { 0%,90%,100% {background-color: rgba(50,50,70,0.7);} 92%,94% {background-color: rgba(255,255,255,0.9);} }
 
 /* ===========================
    RESPONSIVE
 =========================== */
-@media(max-width:640px){
-  #weather-container { flex-direction:column; align-items:center; }
-  .card { width:90%; }
-  #city-form { flex-direction:column; }
+@media (max-width: 700px) {
+  #weather-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 90%;
+  }
+
+  #city-form {
+    flex-direction: column;
+  }
 }
