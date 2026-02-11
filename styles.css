@@ -1,242 +1,253 @@
-/* ===========================
-   RESET & BASE
-=========================== */
+/* =========================
+   GLOBAL RESET + BASE
+========================= */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html,
 body {
   min-height: 100vh;
-  font-family: "Press Start 2P", monospace;
-  color: #1f2937;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-  /* DAY BACKGROUND */
+body {
   background-image: url("images/Day.jpg");
   background-size: cover;
-  background-position: bottom;
+  background-position: center bottom;
   background-repeat: no-repeat;
 
-  /* 8-bit pixel look */
   image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
+  color: #1f2937;
 
   transition:
-    background-image 0.5s ease,
+    background-image 0.6s ease,
+    background-position 0.6s ease,
     color 0.3s ease;
 
   overflow-x: hidden;
 }
 
-/* NIGHT BACKGROUND */
+/* =========================
+   DARK MODE
+========================= */
+
 body.dark {
   background-image: url("images/Night.jpg");
   background-size: cover;
-  background-position: center 105%;
+  background-position: center bottom;
   background-repeat: no-repeat;
 
   image-rendering: pixelated;
-  -ms-interpolation-mode: nearest-neighbor;
+  image-rendering: crisp-edges;
+
+  color: #e5e7eb;
 }
 
-/* ===========================
-   HEADER
-=========================== */
+/* =========================
+   PAGE LAYOUT
+========================= */
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
 header {
-  text-align: center;
-  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-header h1 {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
+/* =========================
+   CONTROLS
+========================= */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.note {
-  font-size: 0.7rem;
+button {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  background: rgba(255, 255, 255, 0.85);
+  color: #111827;
+
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    background 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25);
+}
+
+body.dark button {
+  background: rgba(30, 41, 59, 0.85);
+  color: #e5e7eb;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+input[type="text"] {
+  flex: 1 1 200px;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.9rem;
+
+  border-radius: 8px;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+
+  outline: none;
+}
+
+body.dark input[type="text"] {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #e5e7eb;
+}
+
+/* =========================
+   STATUS TEXT
+========================= */
+
+#status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  min-height: 1.2em;
   opacity: 0.85;
 }
 
-/* ===========================
-   CONTROLS
-=========================== */
-.controls-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
+/* =========================
+   WEATHER GRID
+========================= */
 
-#city-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-#city-form input {
-  padding: 8px;
-  border: 2px solid #64748b;
-  border-radius: 6px;
-  font-family: inherit;
-  width: 180px;
-}
-
-#city-form button {
-  padding: 8px 12px;
-  font-family: inherit;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #3b82f6;
-  color: white;
-}
-
-#city-form button:hover {
-  transform: scale(1.05);
-}
-
-.toggles {
-  display: flex;
-  gap: 10px;
-}
-
-.toggles button {
-  padding: 8px 12px;
-  font-family: inherit;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #475569;
-  color: white;
-}
-
-.toggles button:hover {
-  transform: scale(1.05);
-}
-
-#status {
-  min-height: 20px;
-  font-size: 0.75rem;
-  text-align: center;
-}
-
-/* ===========================
-   WEATHER CONTAINER
-=========================== */
 #weather-container {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 18px;
-  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
 }
 
-/* ===========================
+/* =========================
    WEATHER CARDS
-=========================== */
-.card {
-  width: 220px;
-  padding: 14px;
-  border-radius: 10px;
-  border: 3px solid #64748b;
+========================= */
+
+.weather-card {
+  padding: 1.25rem;
+  border-radius: 14px;
+
   background: rgba(255, 255, 255, 0.88);
-  text-align: center;
+  color: #111827;
+
+  box-shadow:
+    0 6px 0 rgba(0, 0, 0, 0.25),
+    0 10px 20px rgba(0, 0, 0, 0.15);
+
   position: relative;
-  overflow: hidden;
 
-  transition: transform 0.2s, background 0.3s;
+  transition:
+    transform 0.15s ease,
+    background 0.3s ease,
+    box-shadow 0.15s ease;
 }
 
-.card:hover {
-  transform: translateY(-4px);
+.weather-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 0 rgba(0, 0, 0, 0.3),
+    0 14px 24px rgba(0, 0, 0, 0.2);
 }
 
-body.dark .card {
-  background: rgba(15, 23, 42, 0.9);
-  border-color: #334155;
+body.dark .weather-card {
+  background: rgba(15, 23, 42, 0.88);
+  color: #e5e7eb;
 }
 
-.card h2 {
+/* =========================
+   CARD CONTENT
+========================= */
+
+.weather-card h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.weather-time {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-bottom: 0.75rem;
+}
+
+.weather-temp {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.weather-desc {
   font-size: 0.9rem;
-  margin-bottom: 8px;
+  opacity: 0.9;
 }
 
-.card p {
-  font-size: 0.75rem;
-  margin-bottom: 4px;
+.weather-error {
+  font-size: 0.85rem;
+  color: #b91c1c;
 }
 
-/* ===========================
-   WEATHER ICONS (8-bit vibe)
-=========================== */
-.weather-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
+body.dark .weather-error {
+  color: #fca5a5;
 }
 
-.sunny::before { content: "☀️"; }
-.moon::before { content: "🌙"; }
-.cloudy::before { content: "☁️"; }
-.snow::before { content: "❄️"; }
-.thunderstorm::before { content: "⚡"; }
+/* =========================
+   LOADING STATE
+========================= */
 
-/* ===========================
-   SUBTLE CLOUD DRIFT INSIDE CARDS
-=========================== */
-.card::after {
-  content: "";
-  position: absolute;
-  bottom: 10%;
-  left: -20%;
-  width: 150%;
-  height: 40%;
-  pointer-events: none;
-
-  background:
-    radial-gradient(circle at 20% 60%, rgba(255,255,255,0.35) 18px, transparent 19px),
-    radial-gradient(circle at 40% 55%, rgba(255,255,255,0.3) 14px, transparent 15px),
-    radial-gradient(circle at 70% 65%, rgba(255,255,255,0.25) 16px, transparent 17px);
-
-  animation: cloud-drift 18s linear infinite;
+.loading {
+  font-size: 0.9rem;
+  opacity: 0.7;
 }
 
-body.dark .card::after {
-  background:
-    radial-gradient(circle at 20% 60%, rgba(200,200,200,0.2) 18px, transparent 19px),
-    radial-gradient(circle at 40% 55%, rgba(180,180,180,0.18) 14px, transparent 15px),
-    radial-gradient(circle at 70% 65%, rgba(160,160,160,0.15) 16px, transparent 17px);
-}
-
-@keyframes cloud-drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(30px); }
-}
-
-/* ===========================
-   ERROR STATE
-=========================== */
-.error-message {
-  color: #dc2626;
-  font-size: 0.75rem;
-  margin-top: 6px;
-}
-
-/* ===========================
+/* =========================
    RESPONSIVE
-=========================== */
-@media (max-width: 700px) {
-  #weather-container {
-    flex-direction: column;
-    align-items: center;
+========================= */
+
+@media (max-width: 600px) {
+  header {
+    gap: 0.75rem;
   }
 
-  .card {
-    width: 90%;
+  button {
+    width: 100%;
   }
 
-  #city-form {
+  form {
     flex-direction: column;
   }
 }
